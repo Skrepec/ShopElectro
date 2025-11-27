@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Отзывы | ShopElectro</title>
+<style>
+:root{
+  --bg:#121212; --card:#1e1e1e; --muted:#2a2a2a; --accent:#ff6600; --text:#e6e6e6; --mutedText:#bfbfbf;
+}
+body.light{
+  --bg:#f6f6f6; --card:#ffffff; --muted:#efefef; --accent:#ff6600; --text:#111111; --mutedText:#6b6b6b;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background .22s,color .22s}
+a{color:inherit}
+
+
+.header{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; gap:12px;
+  padding:12px 22px; background:var(--card);
+  box-shadow:0 1px 0 rgba(0,0,0,0.35);
+}
+.header-left{display:flex;align-items:center;gap:12px}
+.home-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;font-size:20px}
+.logo{font-weight:700}
+.search{flex:1;max-width:720px;display:flex;gap:8px;align-items:center}
+.search input{width:100%;padding:10px;border-radius:10px;border:none;background:var(--muted);color:var(--text)}
+.search button{height:40px;padding:8px 10px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.nav{display:flex;gap:10px}
+.nav button{background:var(--muted);color:var(--text);border:none;padding:10px 18px;border-radius:10px;cursor:pointer}
+.nav button.active{background:var(--accent);color:#111}
+#themeToggle{width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.hamburger{display:none;width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+
+
+.container{max-width:1200px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:1fr 360px;gap:24px}
+.panel{background:var(--card);border-radius:12px;padding:20px}
+.header-panel{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.header-panel h2{margin:0;font-size:1.1rem}
+.avg{display:flex;align-items:center;gap:12px;font-weight:700;color:var(--text)}
+.avg .score{color:var(--accent);font-size:1.6rem;font-weight:900}
+.leave-btn{background:var(--accent);color:#111;border:none;padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:700}
+.reviews-list{margin-top:8px}
+
+
+.review-item{background:rgba(255,255,255,0.02);padding:18px;border-radius:10px;margin-bottom:14px;display:flex;gap:16px;align-items:flex-start}
+.avatar{width:56px;height:56px;border-radius:50%;background:#222;flex:0 0 56px}
+.review-body{flex:1}
+.review-meta{display:flex;justify-content:space-between;align-items:center}
+.review-author{font-weight:700}
+.review-date{color:var(--mutedText);font-size:0.9rem}
+.review-text{margin-top:8px;color:var(--text);line-height:1.5} 
+.review-rating{color:var(--accent);font-weight:800}
+
+
+.side .panel{margin-bottom:18px}
+.filter-group{margin-bottom:12px}
+.filter-group label{display:block;color:var(--mutedText);margin-bottom:8px}
+.filter-group input[type="checkbox"]{accent-color:var(--accent);margin-right:8px}
+.filter-actions button{width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:#111;font-weight:800}
+
+
+.form-field{display:block;margin-bottom:12px}
+.form-field input[type="text"], .form-field textarea, .form-field input[type="url"], .form-field select {width:100%;padding:10px;border-radius:8px;border:none;background:var(--muted);color:var(--text)}
+.form-row{display:flex;gap:8px}
+.small{font-size:0.9rem;color:var(--mutedText)}
+
+
+.pager{display:flex;gap:8px;align-items:center;justify-content:flex-start;margin-top:18px}
+.page-btn{background:var(--muted);border:none;color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer}
+.page-btn.active{background:var(--accent);color:#111}
+
+
+.note{color:var(--mutedText);font-size:0.85rem;margin-top:12px}
+
+
+@media (max-width:1000px){ .container{grid-template-columns:1fr;padding:20px} .side{order:2} }
+@media (max-width:760px){
+  .nav{display:none}
+  .hamburger{display:inline-flex}
+  .search{order:2;width:100%;max-width:none}
+  #themeToggle{order:3}
+  .container{grid-template-columns:1fr;gap:16px}
+  .review-item{flex-direction:column;align-items:stretch}
+  .avatar{align-self:flex-start}
+}
+button:focus,input:focus{outline:3px solid rgba(255,102,0,0.18);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<header class="header" role="banner">
+  <div class="header-left">
+    <button class="hamburger" id="hamburger" aria-label="Открыть меню">☰</button>
+    <a href="index.html" class="home-icon" title="Главная">🏠</a>
+    <div class="logo">ShopElectro</div>
+  </div>
+
+  <div class="search" role="search">
+    <input id="globalSearch" placeholder="Поиск по товарам..." aria-label="Поиск по товарам" />
+    <button id="searchBtn" title="Искать">🔎</button>
+  </div>
+
+  <nav class="nav" role="navigation" aria-label="Главная навигация">
+    <a href="catalog.html"><button>Каталог</button></a>
+    <a href="profile.html"><button>Профиль</button></a>
+    <a href="orders.html"><button>Корзина</button></a>
+    <a href="reviews.html"><button class="active">Отзывы</button></a>
+    <a href="company.html"><button>О компании/Гарантии</button></a>
+  </nav>
+
+  <button id="themeToggle" title="Переключить тему" aria-pressed="false">🌓</button>
+</header>
+
+<div class="container">
+  <main>
+    <section class="panel">
+      <div class="header-panel">
+        <div>
+          <h2>Что говорят наши клиенты</h2>
+          <div class="small">Средний рейтинг: <span id="avgLocal" style="font-weight:700;margin-left:8px">—</span></div>
+        </div>
+        <button class="leave-btn" id="openWrite">Оставить отзыв</button>
+      </div>
+
+      <div id="reviewsWrap" class="reviews-list" aria-live="polite">
+       
+      </div>
+
+      <div class="pager" id="pager" role="navigation" aria-label="Пагинация отзывов"></div>
+
+      <div class="note">Спасибо нашим клиентам — ваш отзыв важен</div>
+    </section>
+  </main>
+
+  <aside class="side">
+    <div class="panel">
+      <h3>Фильтры отзывов</h3>
+      <div class="filter-group">
+        <label>Рейтинг</label>
+        <label><input type="radio" name="frate" value="all" checked> Все</label>
+        <label><input type="radio" name="frate" value="5"> 5 звёзд</label>
+        <label><input type="radio" name="frate" value="4"> 4 звезды и выше</label>
+        <label><input type="radio" name="frate" value="3"> 3 звезды и выше</label>
+      </div>
+      <div class="filter-group">
+        <label><input type="checkbox" id="withPhoto"> Только с фото</label>
+      </div>
+      <div class="filter-group">
+        <button id="applyFilters" class="filter-actions">Фильтр отзывов</button>
+      </div>
+    </div>
+
+    <div class="panel" aria-label="Форма добавления отзыва">
+      <h3>Написать отзыв</h3>
+      <div style="min-height:180px">
+        <div class="form-field">
+          <input id="author" type="text" placeholder="Ваше имя" />
+        </div>
+        <div class="form-field form-row">
+          <select id="ratingSelect" aria-label="Рейтинг">
+            <option value="5">5 — Отлично</option>
+            <option value="4">4 — Хорошо</option>
+            <option value="3">3 — Удовлетворительно</option>
+            <option value="2">2 — Плохо</option>
+            <option value="1">1 — Ужасно</option>
+          </select>
+          <input id="dateInput" type="text" placeholder="Дата (напр. 12 июня 2025)" />
+        </div>
+        <div class="form-field">
+          <input id="photoUrl" type="url" placeholder="Ссылка на фото (опционально)" />
+        </div>
+        <div class="form-field">
+          <textarea id="textInput" rows="5" placeholder="Текст отзыва..."></textarea>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button id="submitReview" class="filter-actions">Оставить отзыв</button>
+          <button id="clearForm" class="page-btn">Очистить</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'shopReviews';
+  const perPage = 3;
+  let allReviews = loadReviews();
+  let filters = { rating: 'all', withPhoto: false, q: '' };
+  let page = 1;
+
+  function loadReviews(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return JSON.parse(raw).sort((a,b)=>new Date(b.dateISO) - new Date(a.dateISO));
+    } catch(e){}
+    return [
+      { id: 1, author: 'Анна П.', date: '12 июня 2025', dateISO: '2025-06-12', text: 'Отличный сервис, быстрая доставка. Товар соответствует описанию.', rating: 5, photo: '' },
+      { id: 2, author: 'Иван К.', date: '5 мая 2025', dateISO: '2025-05-05', text: 'Хорошее качество, но упаковка могла быть лучше.', rating: 4, photo: '' },
+      { id: 3, author: 'Мария Л.', date: '28 апреля 2025', dateISO: '2025-04-28', text: 'Цены адекватные, менеджер помог с выбором.', rating: 5, photo: '' }
+    ];
+  }
+
+  function saveReviews(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(allReviews));
+    window.dispatchEvent(new Event('storage'));
+  }
+
+  function calcAvg(revs){
+    if(revs.length===0) return 0;
+    const s = revs.reduce((acc,r)=>acc + (Number(r.rating)||0),0);
+    return Math.round((s/revs.length) * 10) / 10;
+  }
+
+  function formatReviewHTML(r){
+    const photoPart = r.photo ? `<div style="width:100%;margin-top:10px"><img src="${escapeHtml(r.photo)}" alt="" style="max-width:160px;border-radius:8px"></div>` : '';
+    return `
+      <div class="review-item" data-id="${r.id}">
+        <div class="avatar" aria-hidden="true"></div>
+        <div class="review-body">
+          <div class="review-meta">
+            <div>
+              <div class="review-author">${escapeHtml(r.author)}</div>
+              <div class="review-date small">${escapeHtml(r.date)}</div>
+            </div>
+            <div class="review-rating" aria-hidden="true">${escapeHtml(String(r.rating))}★</div>
+          </div>
+          <div class="review-text">"${escapeHtml(r.text)}"</div>
+          ${photoPart}
+        </div>
+      </div>
+    `;
+  }
+
+  function escapeHtml(s){ return (String(s||'')).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function render(){
+    const q = (document.getElementById('searchInput') && document.getElementById('searchInput').value || '').trim().toLowerCase();
+    const headerQ = (document.getElementById('globalSearch') && document.getElementById('globalSearch').value || '').trim().toLowerCase();
+    filters.q = q || headerQ;
+    let filtered = allReviews.filter(r=>{
+      if(filters.rating !== 'all'){
+        if(filters.rating === '5') return r.rating === 5;
+        if(filters.rating === '4') return r.rating >= 4;
+        if(filters.rating === '3') return r.rating >= 3;
+      }
+      if(filters.withPhoto && !r.photo) return false;
+      if(filters.q){
+        const text = (r.author + ' ' + r.text).toLowerCase();
+        if(!text.includes(filters.q)) return false;
+      }
+      return true;
+    });
+
+    document.getElementById('avgLocal').innerText = calcAvg(allReviews) || '—';
+
+    const total = filtered.length;
+    const pages = Math.max(1, Math.ceil(total / perPage));
+    if(page > pages) page = pages;
+
+    const start = (page-1)*perPage;
+    const pageSlice = filtered.slice(start, start + perPage);
+
+    const wrap = document.getElementById('reviewsWrap');
+    wrap.innerHTML = pageSlice.map(formatReviewHTML).join('') || '<div class="panel" style="padding:18px;color:var(--mutedText)">Пока нет отзывов, будьте первым!</div>';
+
+    const pager = document.getElementById('pager');
+    pager.innerHTML = '';
+    for(let i=1;i<=pages;i++){
+      const b = document.createElement('button');
+      b.className = 'page-btn' + (i===page? ' active':'');
+      b.textContent = i;
+      b.addEventListener('click', ()=>{ page = i; render(); });
+      pager.appendChild(b);
+    }
+    if(pages>1){
+      const showMore = document.createElement('button');
+      showMore.className = 'page-btn';
+      showMore.textContent = 'Показать ещё';
+      showMore.addEventListener('click', ()=>{
+        if(page < pages){ page++; render(); }
+      });
+      pager.appendChild(showMore);
+    }
+  }
+
+
+  document.getElementById('applyFilters').addEventListener('click', ()=>{
+    const sel = document.querySelector('input[name="frate"]:checked').value;
+    filters.rating = sel;
+    filters.withPhoto = document.getElementById('withPhoto').checked;
+    page = 1;
+    render();
+  });
+
+  document.getElementById('searchInput')?.addEventListener('input', ()=>{ page = 1; render(); });
+
+  document.getElementById('openWrite').addEventListener('click', ()=>{
+    document.getElementById('author').focus();
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  });
+
+  document.getElementById('submitReview').addEventListener('click', ()=>{
+    const author = (document.getElementById('author').value || '').trim();
+    const rating = Number(document.getElementById('ratingSelect').value) || 0;
+    const text = (document.getElementById('textInput').value || '').trim();
+    const photo = (document.getElementById('photoUrl').value || '').trim();
+    let dateText = (document.getElementById('dateInput').value || '').trim();
+    if(!author || !text){ alert('Пожалуйста, введите имя и текст отзыва.'); return; }
+    if(!dateText){
+      const d = new Date();
+      const monthNames = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+      dateText = `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+    }
+    const id = (allReviews.reduce((m,r)=>Math.max(m,r.id||0),0) || 0) + 1;
+    const iso = new Date().toISOString();
+    const newR = { id, author, date: dateText, dateISO: iso, text, rating, photo };
+    allReviews.unshift(newR);
+    saveReviews();
+    document.getElementById('author').value=''; document.getElementById('textInput').value=''; document.getElementById('photoUrl').value=''; document.getElementById('dateInput').value='';
+    page = 1;
+    render();
+    alert('Спасибо! Ваш отзыв добавлен.');
+  });
+
+  document.getElementById('clearForm').addEventListener('click', ()=>{
+    document.getElementById('author').value=''; document.getElementById('textInput').value=''; document.getElementById('photoUrl').value=''; document.getElementById('dateInput').value='';
+  });
+
+ 
+  window.addEventListener('storage', (e)=>{
+    if(e.key === STORAGE_KEY || e.key === null){
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) allReviews = JSON.parse(raw).sort((a,b)=>new Date(b.dateISO)-new Date(a.dateISO));
+      } catch(e){}
+      render();
+    }
+  });
+
+
+  (function prefillHeaderFromURL(){
+    try{
+      const params = new URLSearchParams(location.search);
+      const q = params.get('q') || params.get('search') || '';
+      if(q && document.getElementById('globalSearch')) document.getElementById('globalSearch').value = q;
+    }catch(e){}
+  })();
+
+
+  const headerSearch = document.getElementById('globalSearch');
+  if(headerSearch){
+    headerSearch.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        
+        const q = headerSearch.value.trim();
+        const url = new URL('catalog.html', location.href);
+        if(q) url.searchParams.set('q', q);
+        location.href = url.toString();
+      }
+    });
+  }
+
+  render();
+
+})();
+</script>
+
+
+<script>
+(function(){
+  const hamb = document.getElementById('hamburger');
+  const nav = document.querySelector('.nav');
+  if(hamb && nav){
+    const panel = document.createElement('div');
+    panel.id = 'mobileNavPanel';
+    Object.assign(panel.style,{
+      position:'fixed', top:'0', right:'0', height:'100vh', width:'80%', maxWidth:'360px',
+      background: getComputedStyle(document.documentElement).getPropertyValue('--card') || 'var(--card)',
+      boxShadow:'-10px 0 30px rgba(0,0,0,0.4)', transform:'translateX(100%)',
+      transition:'transform .22s ease', zIndex:9999, padding:'20px', overflowY:'auto'
+    });
+    panel.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px">${nav.innerHTML}</div><div style="height:20px"></div><button id="mobileClose" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--muted);color:var(--text);">Закрыть</button>`;
+    document.body.appendChild(panel);
+
+    function open(){ panel.style.transform='translateX(0)'; document.body.style.overflow='hidden'; }
+    function close(){ panel.style.transform='translateX(100%)'; document.body.style.overflow=''; }
+    hamb.addEventListener('click', open);
+    panel.querySelector('#mobileClose').addEventListener('click', close);
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+  }
+
+  const THEME_KEY = 'siteTheme';
+  const themeBtn = document.getElementById('themeToggle');
+  const searchBtn = document.getElementById('searchBtn');
+  const globalSearch = document.getElementById('globalSearch');
+
+  function updateThemeButton(){
+    if(!themeBtn) return;
+    const isLight = document.body.classList.contains('light');
+    themeBtn.textContent = isLight ? '🌞' : '🌙';
+    themeBtn.setAttribute('aria-pressed', String(isLight));
+  }
+  function initTheme(){
+    const t = localStorage.getItem(THEME_KEY) || 'dark';
+    document.body.classList.toggle('light', t === 'light');
+    updateThemeButton();
+  }
+  function toggleTheme(){
+    const newVal = document.body.classList.contains('light') ? 'dark' : 'light';
+    document.body.classList.toggle('light');
+    localStorage.setItem(THEME_KEY, newVal);
+    updateThemeButton();
+  }
+
+  if(themeBtn) themeBtn.addEventListener('click', toggleTheme);
+  if(searchBtn && globalSearch) searchBtn.addEventListener('click', ()=> {
+    const q = (globalSearch.value||'').trim();
+    const url = new URL('catalog.html', location.href);
+    if(q) url.searchParams.set('q', q);
+    location.href = url.toString();
+  });
+
+  initTheme();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ShopElectro — Главная</title>
+  <style>
+    :root{
+      --bg:#121212; --panel:#1e1e1e; --muted:#2a2a2a; --accent:#ff6600; --text:#eaeaea;
+      --mutedText:#cfcfcf;
+      --radius:12px; --btn-h:44px;
+    }
+    body.light{
+      --bg:#f6f6f6; --panel:#ffffff; --muted:#efefef; --accent:#ff6600; --text:#111111; --mutedText:#444444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      transition:background .22s,color .22s;
+    }
+    .header{
+      position:sticky; top:0; z-index:60;
+      display:flex; align-items:center; gap:14px;
+      padding:12px 16px; background:var(--panel);
+      box-shadow:0 1px 0 rgba(0,0,0,0.4);
+    }
+    .header-left{display:flex;align-items:center;gap:12px}
+    .home-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;font-size:20px;text-decoration:none}
+    .logo{font-weight:700}
+    .search{flex:1;max-width:720px;display:flex;gap:8px;align-items:center}
+    .search input{
+      width:100%; padding:10px 12px; border-radius:10px; border:none;
+      background:var(--muted); color:var(--text);
+    }
+    .nav{display:flex;gap:10px;align-items:center}
+    .nav a{ text-decoration:none }
+    .nav button{
+      height:var(--btn-h); min-width:92px; padding:0 14px; border-radius:10px; border:none;
+      background:var(--muted); color:var(--text); cursor:pointer;
+      display:inline-flex;align-items:center;justify-content:center;
+    }
+    .nav button.active{background:var(--accent); color:#111}
+    #themeToggle{width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+    .hamburger{display:none;width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+    .container{max-width:1200px;margin:20px auto;padding:0 18px;display:grid;gap:20px}
+    .hero{display:grid;grid-template-columns:1fr 480px;gap:20px;align-items:stretch}
+    .hero-panel{background:var(--panel);padding:28px;border-radius:12px;display:flex;flex-direction:column;justify-content:center}
+    .hero-panel h1{margin:0 0 14px;font-size:34px;line-height:1.02;color:var(--text)}
+    .hero-panel p{color:var(--mutedText);margin:0 0 18px}
+    .hero-cta{background:var(--accent);border:none;color:#111;padding:12px 16px;border-radius:10px;font-weight:800;cursor:pointer}
+    .hero-image{background:var(--muted);border-radius:12px;overflow:hidden;min-height:260px;display:block}
+    .hero-image img{width:100%;height:100%;object-fit:cover;display:block}
+    .section-title{color:var(--mutedText);font-size:0.95rem}
+    .grid-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
+    .card{background:var(--panel);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;transition:transform .18s,box-shadow .18s}
+    .card:hover{transform:translateY(-6px);box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    .slider{position:relative;border-radius:10px;overflow:hidden;height:160px;background:#222;display:flex;align-items:center;justify-content:center}
+    .slider img{width:100%;height:100%;object-fit:cover;display:block}
+    .sbtn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:#fff;padding:8px;border-radius:999px;cursor:pointer}
+    .sbtn:hover{background:rgba(255,102,0,0.9)}
+    .sleft{left:10px} .sright{right:10px}
+    .meta{font-size:0.95rem;color:var(--mutedText)}
+    .price{color:var(--accent);font-weight:800}
+    .actions{display:flex;gap:8px;margin-top:auto}
+    .actions .btn{flex:1;height:40px;border-radius:10px;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+    .btn.buy{background:var(--accent);color:#111}
+    .btn.cart{background:var(--muted);color:var(--text)}
+    .btn.details{background:#444;color:#fff}
+    .news-block{background:var(--panel);padding:16px;border-radius:12px}
+    .news-content{background:var(--muted);padding:14px;border-radius:8px;color:var(--mutedText);height:120px}
+    .mobile-nav-panel{position:fixed;right:0;top:0;height:100vh;width:84%;max-width:360px;background:var(--panel);box-shadow:-10px 0 30px rgba(0,0,0,0.45);transform:translateX(100%);transition:transform .22s ease;z-index:9999;padding:18px;display:flex;flex-direction:column;gap:14px}
+    .mobile-nav-panel.show{transform:translateX(0)}
+    .mobile-nav-panel a{display:block;text-decoration:none}
+    @media (max-width:1100px){ .hero{grid-template-columns:1fr 1fr} .grid-row{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:760px){
+      .hero{grid-template-columns:1fr;align-items:stretch}
+      .hero-image{order:2}
+      .grid-row{grid-template-columns:1fr}
+      .nav{display:none}
+      .hamburger{display:inline-flex}
+      .search{order:2;width:100%}
+      #themeToggle{order:3}
+    }
+  </style>
+</head>
+<body>
+  <header class="header" role="banner">
+    <div class="header-left">
+      <button class="hamburger" id="hamburger" aria-label="Открыть меню">☰</button>
+      <a class="home-icon" href="index.html" title="Главная">🏠</a>
+      <div class="logo">ShopElectro</div>
+    </div>
+
+    <div class="search" role="search">
+      <input id="globalSearch" placeholder="Поиск по товарам..." aria-label="Поиск по товарам" />
+    </div>
+
+    <nav class="nav" role="navigation" aria-label="Главная навигация">
+      <a href="catalog.html"><button class="active">Каталог</button></a>
+      <a href="profile.html"><button>Профиль</button></a>
+      <a href="orders.html"><button>Корзина</button></a>
+      <a href="reviews.html"><button>Отзывы</button></a>
+      <a href="company.html"><button>Компания</button></a>
+    </nav>
+
+    <button id="themeToggle" title="Переключить тему" aria-pressed="false">🌓</button>
+  </header>
+
+  <div id="mobileNavPanel" class="mobile-nav-panel" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>Навигация</strong>
+      <button id="mobileClose" aria-label="Закрыть" style="background:var(--muted);border:none;padding:8px;border-radius:8px;color:var(--text)">✕</button>
+    </div>
+    <a href="catalog.html"><button style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--muted);color:var(--text);text-align:left">Каталог</button></a>
+    <a href="profile.html"><button style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--muted);color:var(--text);text-align:left">Профиль</button></a>
+    <a href="orders.html"><button style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--muted);color:var(--text);text-align:left">Корзина</button></a>
+    <a href="reviews.html"><button style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--muted);color:var(--text);text-align:left">Отзывы</button></a>
+    <a href="company.html"><button style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--muted);color:var(--text);text-align:left">Компания</button></a>
+  </div>
+
+  <main class="container">
+    <section class="hero" aria-label="Приветственный блок">
+      <div class="hero-panel">
+        <h1>Магазин где вы найдёте любые товары</h1>
+        <p>Игровая периферия, офисная техника, мониторы и аксессуары — всё в одном месте.</p>
+        <div style="margin-top:12px">
+          <a href="catalog.html"><button class="hero-cta">Каталог товаров</button></a>
+        </div>
+      </div>
+
+      <div class="hero-image" aria-hidden="true">
+        <img src="images/logo.jpg" alt="Banner">
+      </div>
+    </section>
+
+    <div>
+      <div class="section-title">Последние популярные товары</div>
+      <div class="grid-row" id="previewGrid"></div>
+    </div>
+
+    <div style="display:flex;gap:18px;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <div class="news-block">
+          <h3>Блок новостей</h3>
+          <div class="news-content">Свежие акции, поступления и важные объявления магазина. Подписывайтесь и не пропустите скидки.</div>
+        </div>
+      </div>
+      <aside style="width:320px;min-width:220px">
+        <div class="news-block">
+          <h3>Рекомендуемые категории</h3>
+          <div style="margin-top:10px;color:var(--mutedText);line-height:1.6">
+            <div>• Игровая периферия</div>
+            <div>• Офисная техника</div>
+            <div>• Мониторы</div>
+            <div>• Аксессуары</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const THEME_KEY = 'siteTheme';
+      const CART_KEY = 'shopCart';
+      const hamburger = document.getElementById('hamburger');
+      const mobilePanel = document.getElementById('mobileNavPanel');
+      const mobileClose = document.getElementById('mobileClose');
+
+      function initTheme(){
+        const t = localStorage.getItem(THEME_KEY) || 'dark';
+        document.body.classList.toggle('light', t === 'light');
+        updateThemeButton();
+      }
+      function toggleTheme(){
+        document.body.classList.toggle('light');
+        const newVal = document.body.classList.contains('light') ? 'light' : 'dark';
+        localStorage.setItem(THEME_KEY, newVal);
+        updateThemeButton();
+      }
+      function updateThemeButton(){
+        const btn = document.getElementById('themeToggle');
+        if(!btn) return;
+        btn.textContent = document.body.classList.contains('light') ? '🌞' : '🌙';
+      }
+
+      function globalSearchHandler(e){
+        if(e.key !== 'Enter') return;
+        const q = (e.target.value || '').trim();
+        const url = new URL('catalog.html', location.href);
+        if(q) url.searchParams.set('q', q);
+        location.href = url.toString();
+      }
+
+      document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+      document.getElementById('globalSearch').addEventListener('keydown', globalSearchHandler);
+      initTheme();
+
+      window.loadCart = function(){ try{ return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); }catch(e){ return []; } };
+      window.saveCart = function(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); window.dispatchEvent(new Event('storage')); };
+      window.addToCart = function(product, qty=1){
+        const cart = window.loadCart();
+        const idx = cart.findIndex(i => Number(i.id) === Number(product.id));
+        if(idx > -1) cart[idx].qty = (cart[idx].qty||0) + qty;
+        else cart.push({ id: product.id, name: product.name, price: product.price, img: product.img||'', qty: qty, brand: product.brand||'' });
+        window.saveCart(cart);
+        const prev = document.getElementById('cartToast');
+        if(prev) prev.remove();
+        const t = document.createElement('div');
+        t.id = 'cartToast';
+        t.style.position = 'fixed'; t.style.left = '50%'; t.style.top = '14%';
+        t.style.transform = 'translateX(-50%)'; t.style.background = 'var(--panel)';
+        t.style.color = 'var(--text)'; t.style.padding = '10px 14px'; t.style.borderRadius = '10px';
+        t.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)'; t.textContent = 'Товар добавлен в корзину';
+        document.body.appendChild(t);
+        setTimeout(()=> t.remove(), 1500);
+      };
+
+      function openMobile(){ mobilePanel.classList.add('show'); mobilePanel.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+      function closeMobile(){ mobilePanel.classList.remove('show'); mobilePanel.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+      if(hamburger) hamburger.addEventListener('click', openMobile);
+      if(mobileClose) mobileClose.addEventListener('click', closeMobile);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeMobile(); });
+
+    })();
+
+    const demoProducts = [
+      { id:1, name:'Игровая мышь GX100', category:'mouse', brand:'Brand A', price:1490, img:'images/gx100_1.jpg', imgs:['images/gx100_2.jpg','images/gx100_3.jpg'] },
+      { id:2, name:'Офисная клавиатура KB200', category:'keyboard', brand:'Brand B', price:2290, img:'images/keyboardkb200_1.jpg', imgs:['images/keyboardkb200_2.jpg'] },
+      { id:3, name:'Монитор UltraView 24"', category:'monitor', brand:'Brand C', price:4990, img:'images/ultraw24_1.jpg', imgs:['images/ultraw24_2.jpg'] },
+      { id:4, name:'Мышь Compact Lite', category:'mouse', brand:'Brand B', price:990, img:'images/compactl1_1.jpg', imgs:['images/compactl1_2.jpg'] },
+      { id:5, name:'Клавиатура Mechanical Pro', category:'keyboard', brand:'Brand C', price:3590, img:'images/mechpro1.jpg', imgs:['images/mechpro2.jpg'] },
+      { id:6, name:'Монитор Office 21"', category:'monitor', brand:'Brand A', price:2790, img:'images/monoffice1.jpg', imgs:['images/monoffice2.jpg'] },
+      { id:7, name:'Игровая мышь Neon RGB', category:'mouse', brand:'Brand C', price:1990, img:'images/neonrgb1.jpg', imgs:[] },
+      { id:8, name:'Монитор VisionX 27"', category:'monitor', brand:'Brand B', price:5790, img:'images/visionX_1.jpg', imgs:[] },
+      { id:9, name:'Клавиатура SlimBoard', category:'keyboard', brand:'Brand A', price:1890, img:'images/SlimBoard.jpg', imgs:[] },
+    ];
+
+    (function renderPurchasedPreview(){
+      const grid = document.getElementById('previewGrid');
+
+      function loadOrders(){
+        try{
+          const raw = localStorage.getItem('orders');
+          if(!raw) return [];
+          const arr = JSON.parse(raw);
+          if(!Array.isArray(arr)) return [];
+          return arr;
+        }catch(e){ return []; }
+      }
+
+      function getLatestPurchasedProducts(limit = 6){
+        const orders = loadOrders();
+        if(!orders.length) return demoProducts.slice(0, limit);
+
+        const ordered = orders.slice().sort((a,b)=> new Date(b.date) - new Date(a.date));
+        const map = new Map();
+        for(const o of ordered){
+          const date = o.date || o.dateISO || o.created || new Date().toISOString();
+          if(!Array.isArray(o.items)) continue;
+          for(const it of o.items){
+            const id = it.id != null ? String(it.id) : (it.name || Math.random()).toString();
+            const existing = map.get(id);
+            if(!existing){
+              map.set(id, {
+                id: it.id,
+                name: it.name,
+                price: it.price,
+                img: it.img,
+                brand: it.brand,
+                qty: it.qty || 1,
+                lastDate: date
+              });
+            } else {
+              if(new Date(date) > new Date(existing.lastDate)) existing.lastDate = date;
+            }
+          }
+        }
+
+        const arr = Array.from(map.values()).sort((a,b)=> new Date(b.lastDate) - new Date(a.lastDate));
+        return arr.slice(0, limit);
+      }
+
+      function clearGrid(){ grid.innerHTML = ''; }
+
+      function render(){
+        clearGrid();
+        const items = getLatestPurchasedProducts(6);
+        if(!items || !items.length){
+          grid.innerHTML = '<div style="color:var(--mutedText)">Нет купленных товаров для отображения.</div>';
+          return;
+        }
+
+        items.forEach(p => {
+          const el = document.createElement('div'); el.className = 'card';
+
+          const slider = document.createElement('div'); slider.className = 'slider';
+          const im = document.createElement('img'); im.src = p.img || 'text=No+Image'; im.alt = p.name || 'Товар';
+          slider.appendChild(im);
+
+          const prev = document.createElement('button'); prev.className = 'sbtn sleft'; prev.textContent='‹';
+          const next = document.createElement('button'); next.className = 'sbtn sright'; next.textContent='›';
+          slider.appendChild(prev); slider.appendChild(next);
+
+          const title = document.createElement('div'); title.style.fontWeight = 800; title.style.color = 'var(--text)'; title.textContent = p.name || 'Без имени';
+          const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = p.brand || '';
+          const price = document.createElement('div'); price.className = 'price'; price.textContent = (Number(p.price)||0).toLocaleString('ru-RU') + ' ₸';
+          const actions = document.createElement('div'); actions.className = 'actions';
+          const btnBuy = document.createElement('button'); btnBuy.className = 'btn buy'; btnBuy.textContent = 'Купить';
+          const btnCart = document.createElement('button'); btnCart.className = 'btn cart'; btnCart.textContent = 'В корзину';
+          const link = document.createElement('a'); link.href = `product${p.id}.html`; const btnDet = document.createElement('button'); btnDet.className = 'btn details'; btnDet.textContent = 'Характеристика товара';
+          link.appendChild(btnDet);
+          actions.appendChild(btnBuy); actions.appendChild(btnCart); actions.appendChild(link);
+
+          el.appendChild(slider);
+          el.appendChild(title);
+          el.appendChild(meta);
+          el.appendChild(price);
+          el.appendChild(actions);
+          grid.appendChild(el);
+
+          let imgs = [];
+          if(Array.isArray(p.imgs) && p.imgs.length) imgs = p.imgs.slice();
+          else {
+            const demo = demoProducts.find(d => String(d.id) === String(p.id));
+            if(demo && Array.isArray(demo.imgs)) imgs = demo.imgs.slice();
+          }
+          if(!imgs.length) imgs = [p.img || im.src];
+
+          let idx = 0;
+          prev.addEventListener('click', ()=>{ idx = (idx - 1 + imgs.length) % imgs.length; fadeSwap(im, imgs[idx]); });
+          next.addEventListener('click', ()=>{ idx = (idx + 1) % imgs.length; fadeSwap(im, imgs[idx]); });
+
+          btnCart.addEventListener('click', ()=> addToCart({ id: p.id, name: p.name, price: p.price, img: p.img, brand: p.brand }, 1));
+          btnBuy.addEventListener('click', ()=>{ addToCart({ id: p.id, name: p.name, price: p.price, img: p.img, brand: p.brand }, 1); setTimeout(()=> location.href='orders.html', 250); });
+        });
+      }
+
+      function fadeSwap(imgEl, src){
+        imgEl.style.transition = 'opacity .16s';
+        imgEl.style.opacity = 0;
+        setTimeout(()=>{ imgEl.src = src; imgEl.style.opacity = 1; }, 160);
+      }
+
+      render();
+
+      window.addEventListener('storage', (e)=>{
+        if(e.key === 'orders' || e.key === null) render();
+      });
+
+      window.renderPurchasedPreview = render;
+    })();
+  </script>
+</body>
+</html>

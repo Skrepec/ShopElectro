@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Корзина / Оформление заказа | ShopElectro</title>
+<style>
+:root{--bg:#121212;--panel:#1e1e1e;--muted:#2a2a2a;--accent:#ff6600;--text:#eaeaea;--mutedText:#bfbfbf;--radius:12px;--btn-h:44px}
+body.light{--bg:#f6f6f6;--panel:#ffffff;--muted:#efefef;--text:#111111;--mutedText:#6b6b6b}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background .22s,color .22s}
+a{color:inherit;text-decoration:none}
+.header{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:12px;padding:12px 22px;background:var(--panel);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.header-left{display:flex;align-items:center;gap:12px}
+.home-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;font-size:20px}
+.logo{font-weight:700}
+.search{flex:1;max-width:720px;display:flex;gap:8px;align-items:center}
+.search input{width:100%;padding:10px;border-radius:10px;border:none;background:var(--muted);color:var(--text)}
+.search button{height:40px;padding:8px 10px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.nav{display:flex;gap:10px;align-items:center}
+.nav button{background:var(--muted);border:none;padding:8px 14px;border-radius:10px;color:var(--text);cursor:pointer}
+.nav button.active{background:var(--accent);color:#111}
+#themeToggle{width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.hamburger{display:none;width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+
+.main{max-width:1200px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:1fr 360px;gap:24px}
+.cart-panel{background:var(--panel);padding:20px;border-radius:12px}
+.cart-item{display:flex;gap:14px;align-items:center;padding:18px;border-radius:10px;background:rgba(255,255,255,0.02);margin-bottom:12px}
+.thumb{width:88px;height:88px;border-radius:8px;background:#222;background-size:cover;background-position:center}
+.item-info{flex:1}
+.item-info h4{margin:0 0 6px}
+.meta{color:var(--mutedText);font-size:0.9rem}
+.qty{display:flex;gap:8px;align-items:center}
+.qty button{width:34px;height:34px;border-radius:8px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.qty input{width:48px;text-align:center;padding:8px;border-radius:8px;border:none;background:#222;color:var(--text)}
+.price{color:var(--accent);font-weight:800}
+.remove{background:#2a2a2a;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text)}
+.side-panel{background:var(--panel);padding:20px;border-radius:12px;height:fit-content}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+.total{font-size:1.4rem;color:var(--accent);font-weight:900}
+.checkout{width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:#111;font-weight:900;cursor:pointer;margin-top:12px}
+.continue{width:100%;padding:12px;border-radius:12px;border:none;background:var(--muted);color:var(--text);cursor:pointer;margin-top:8px}
+.promo{display:flex;gap:8px;margin-top:12px}
+.promo input{flex:1;padding:10px;border-radius:8px;border:none;background:#222;color:var(--text)}
+.promo button{padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#111;cursor:pointer}
+.empty{padding:36px;text-align:center;color:var(--mutedText)}
+.note{font-size:0.9rem;color:var(--mutedText);margin-top:12px}
+
+.modal-backdrop{position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:10000;padding:20px}
+.modal{background:var(--panel);border-radius:12px;padding:18px;max-width:720px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.6);color:var(--text)}
+.modal h3{margin:0 0 12px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row{display:flex;flex-direction:column;gap:6px}
+.input, textarea, select{padding:10px;border-radius:8px;border:none;background:#222;color:var(--text);width:100%}
+textarea{min-height:80px;resize:vertical;padding:10px}
+.full{grid-column:1 / -1}
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+.btn-secondary{background:var(--muted);border:none;padding:10px 12px;border-radius:8px;color:var(--text);cursor:pointer}
+.btn-primary{background:var(--accent);border:none;padding:10px 12px;border-radius:8px;color:#111;cursor:pointer}
+
+.toast{position:fixed;right:20px;bottom:20px;background:var(--panel);padding:12px 16px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.6);color:var(--text);display:none;z-index:11000}
+
+@media(max-width:980px){.main{grid-template-columns:1fr;padding:0 14px}.side-panel{order:2}.cart-item{flex-direction:column;align-items:stretch}.thumb{width:100%;height:200px;border-radius:10px;background-size:cover}}
+@media(max-width:760px){.nav{display:none}.hamburger{display:inline-flex}.search{order:2;width:100%;max-width:none}#themeToggle{order:3}}
+button:focus,input:focus,textarea:focus{outline:3px solid rgba(255,102,0,0.18);outline-offset:2px}
+</style>
+</head>
+<body>
+<header class="header" role="banner">
+  <div class="header-left">
+    <button class="hamburger" id="hamburger" aria-label="Меню">☰</button>
+    <a class="home-icon" href="index.html" title="Главная">🏠</a>
+    <div class="logo">ShopElectro</div>
+  </div>
+  <div class="search" role="search">
+    <input id="globalSearch" placeholder="Поиск по товарам..." aria-label="Поиск по товарам" />
+    <button id="searchBtn" title="Искать">🔎</button>
+  </div>
+  <nav class="nav" role="navigation" aria-label="Главная навигация">
+    <a href="catalog.html"><button>Каталог</button></a>
+    <a href="profile.html"><button>Профиль</button></a>
+    <a href="orders.html"><button class="active">Корзина</button></a>
+    <a href="reviews.html"><button>Отзывы</button></a>
+    <a href="company.html"><button>О компании</button></a>
+  </nav>
+  <button id="themeToggle" title="Переключить тему" aria-pressed="false">🌓</button>
+</header>
+
+<main class="main">
+  <section class="cart-panel" id="cartPanel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="margin:0">Ваша корзина</h2>
+      <div id="itemsCount" class="meta">0 товаров</div>
+    </div>
+
+    <div id="itemsWrap"></div>
+
+    <div id="emptyState" class="empty" style="display:none">
+      В корзине пока пусто. Перейдите в <a href="catalog.html" style="color:var(--accent);text-decoration:none">каталог</a>, чтобы добавить товары.
+    </div>
+
+    <div style="margin-top:10px">
+      <button id="clearCart" class="remove">Очистить корзину</button>
+    </div>
+  </section>
+
+  <aside class="side-panel">
+    <h3>Итого</h3>
+    <div class="summary-row"><div>Товаров:</div><div id="summaryCount">0</div></div>
+    <div class="summary-row"><div>Товары (сумма):</div><div id="summarySum">₸ 0</div></div>
+    <div class="summary-row"><div>Доставка:</div><div id="shipping">Бесплатно</div></div>
+    <div class="summary-row total"><div>К оплате:</div><div id="toPay">₸ 0</div></div>
+
+    <div style="margin-top:12px">
+      <button id="checkout" class="checkout">Оформить заказ</button>
+      <button id="continue" class="continue">Продолжить покупки</button>
+    </div>
+
+    <div class="promo">
+      <input id="promoCode" placeholder="Промокод" aria-label="Промокод" />
+      <button id="applyPromo">Применить</button>
+    </div>
+
+    <div class="note">Безопасная оплата · Доставка по всей стране · Возврат в течение 14 дней</div>
+  </aside>
+</main>
+
+<div class="modal-backdrop" id="orderModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal" role="document" aria-labelledby="orderTitle">
+    <h3 id="orderTitle">Данные для оформления заказа</h3>
+    <form id="orderForm" novalidate>
+      <div class="form-grid">
+        <div class="form-row full">
+          <label for="fullName">ФИО</label>
+          <input id="fullName" name="fullName" class="input" required autocomplete="name" />
+        </div>
+        <div class="form-row">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" class="input" required autocomplete="email" />
+        </div>
+        <div class="form-row">
+          <label for="phone">Телефон</label>
+          <input id="phone" name="phone" type="tel" class="input" required autocomplete="tel" />
+        </div>
+        <div class="form-row full">
+          <label for="address">Адрес доставки</label>
+          <input id="address" name="address" class="input" required autocomplete="street-address" />
+        </div>
+        <div class="form-row">
+          <label for="city">Город</label>
+          <input id="city" name="city" class="input" required />
+        </div>
+        <div class="form-row">
+          <label for="postal">Почтовый индекс</label>
+          <input id="postal" name="postal" class="input" />
+        </div>
+        <div class="form-row full">
+          <label for="notes">Комментарий к заказу</label>
+          <textarea id="notes" name="notes" class="input"></textarea>
+        </div>
+        <div class="form-row">
+          <label for="delivery">Способ доставки</label>
+          <select id="delivery" name="delivery" class="input">
+            <option value="courier">Курьером</option>
+            <option value="pickup">Самовывоз</option>
+            <option value="postal">Почтой</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="payment">Способ оплаты</label>
+          <select id="payment" name="payment" class="input">
+            <option value="card">Картой онлайн</option>
+            <option value="cod">Наложенный платёж</option>
+            <option value="cash">Оплата при получении</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-secondary" id="cancelOrder">Отмена</button>
+        <button type="submit" class="btn-primary" id="submitOrder">Подтвердить заказ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CART_KEY = 'shopCart';
+const ORDERS_KEY = 'orders';
+function loadCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch(e){ return []; } }
+function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); window.dispatchEvent(new Event('storage')); }
+function saveOrder(o){ const arr = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]'); arr.push(o); localStorage.setItem(ORDERS_KEY, JSON.stringify(arr)); }
+function formatPrice(v){ return '₸ ' + Number(v).toLocaleString('ru-RU'); }
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderCart(){
+  const cart = loadCart();
+  const itemsWrap = document.getElementById('itemsWrap');
+  const empty = document.getElementById('emptyState');
+  const itemsCount = document.getElementById('itemsCount');
+  itemsWrap.innerHTML = '';
+  if(!cart.length){ empty.style.display = 'block'; itemsCount.innerText = '0 товаров'; updateSummary(); return; }
+  empty.style.display = 'none';
+  const totalItems = cart.reduce((s,i)=>s + (i.qty||1),0);
+  itemsCount.innerText = totalItems + ' товаров';
+  cart.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    const thumb = document.createElement('div');
+    thumb.className = 'thumb';
+    thumb.style.backgroundImage = `url('${item.img || 'text=No+Image'}')`;
+    div.appendChild(thumb);
+    const info = document.createElement('div');
+    info.className = 'item-info';
+    info.innerHTML = '<h4>' + escapeHtml(item.name) + '</h4>' + '<div class="meta">Артикул: ' + escapeHtml(String(item.id || '')) + ' • Бренд: ' + escapeHtml(item.brand || '') + '</div>';
+    div.appendChild(info);
+    const right = document.createElement('div');
+    right.style.display = 'flex'; right.style.flexDirection = 'column'; right.style.alignItems = 'flex-end'; right.style.gap = '8px'; right.style.minWidth = '120px';
+    const price = document.createElement('div'); price.className = 'price'; price.innerText = formatPrice(item.price || 0); right.appendChild(price);
+    const qwrap = document.createElement('div'); qwrap.className = 'qty';
+    const btnMinus = document.createElement('button'); btnMinus.innerText = '−'; btnMinus.addEventListener('click', ()=> changeQty(item.id, -1));
+    const inp = document.createElement('input'); inp.value = item.qty || 1; inp.addEventListener('change', (e)=> setQty(item.id, parseInt(e.target.value||1)));
+    const btnPlus = document.createElement('button'); btnPlus.innerText = '+'; btnPlus.addEventListener('click', ()=> changeQty(item.id, +1));
+    qwrap.appendChild(btnMinus); qwrap.appendChild(inp); qwrap.appendChild(btnPlus); right.appendChild(qwrap);
+    const rem = document.createElement('button'); rem.className = 'remove'; rem.innerText = 'Удалить'; rem.addEventListener('click', ()=> removeItem(item.id)); right.appendChild(rem);
+    div.appendChild(right);
+    itemsWrap.appendChild(div);
+  });
+  updateSummary();
+}
+
+function changeQty(id, delta){
+  const cart = loadCart(); const idx = cart.findIndex(x=>x.id===id); if(idx===-1) return;
+  cart[idx].qty = Math.max(1, (cart[idx].qty||1) + delta); saveCart(cart); renderCart();
+}
+function setQty(id, qty){ qty = Math.max(1, parseInt(qty||1)); const cart = loadCart(); const idx = cart.findIndex(x=>x.id===id); if(idx===-1) return; cart[idx].qty = qty; saveCart(cart); renderCart(); }
+function removeItem(id){ let cart = loadCart(); cart = cart.filter(x=>x.id!==id); saveCart(cart); renderCart(); }
+function clearCart(){ if(!confirm('Очистить корзину?')) return; saveCart([]); renderCart(); }
+function updateSummary(){
+  const cart = loadCart(); const count = cart.reduce((s,i)=>s + (i.qty||1),0); const sum = cart.reduce((s,i)=>s + (Number(i.price||0) * (i.qty||1)),0);
+  document.getElementById('summaryCount').innerText = count; document.getElementById('summarySum').innerText = formatPrice(sum); document.getElementById('toPay').innerText = formatPrice(sum);
+}
+function applyPromo(){ const code = document.getElementById('promoCode').value.trim(); if(!code){ showToast('Введите промокод'); return; } if(code.toUpperCase()==='SALE10'){ const cart = loadCart(); const sum = cart.reduce((s,i)=>s + (Number(i.price||0) * (i.qty||1)),0); const discount = Math.round(sum * 0.1); const newSum = Math.max(0, sum - discount); showToast('Промокод применён — скидка 10%: ' + formatPrice(discount)); document.getElementById('toPay').innerText = formatPrice(newSum); } else { showToast('Промокод не найден'); } }
+
+function openOrderModal(){
+  const cart = loadCart(); if(!cart.length){ showToast('Корзина пуста'); return; }
+  const modal = document.getElementById('orderModal'); modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false');
+  const first = document.getElementById('fullName'); first.focus();
+  document.body.style.overflow = 'hidden';
+  trapFocus(modal);
+}
+function closeOrderModal(){
+  const modal = document.getElementById('orderModal'); modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); document.body.style.overflow = '';
+  releaseFocusTrap();
+  document.getElementById('orderForm').reset();
+}
+
+function trapFocus(container){
+  const focusable = container.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+  const first = focusable[0]; const last = focusable[focusable.length-1];
+  function keyHandler(e){ if(e.key==='Tab'){ if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); } else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); } } if(e.key==='Escape'){ closeOrderModal(); } }
+  container._keyHandler = keyHandler; document.addEventListener('keydown', keyHandler);
+}
+function releaseFocusTrap(){
+  const modal = document.getElementById('orderModal'); if(modal && modal._keyHandler){ document.removeEventListener('keydown', modal._keyHandler); delete modal._keyHandler; }
+}
+
+function validateEmail(v){ return /\S+@\S+\.\S+/.test(v); }
+function validatePhone(v){ return v.trim().length >= 6; }
+
+function submitOrderForm(e){
+  e.preventDefault();
+  const cart = loadCart(); if(!cart.length){ showToast('Корзина пуста'); closeOrderModal(); return; }
+  const fullName = document.getElementById('fullName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const city = document.getElementById('city').value.trim();
+  const postal = document.getElementById('postal').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+  const delivery = document.getElementById('delivery').value;
+  const payment = document.getElementById('payment').value;
+  if(!fullName){ showToast('Укажите ФИО'); document.getElementById('fullName').focus(); return; }
+  if(!validateEmail(email)){ showToast('Неверный email'); document.getElementById('email').focus(); return; }
+  if(!validatePhone(phone)){ showToast('Неверный телефон'); document.getElementById('phone').focus(); return; }
+  if(!address){ showToast('Укажите адрес доставки'); document.getElementById('address').focus(); return; }
+  const sum = cart.reduce((s,i)=>s + (Number(i.price||0) * (i.qty||1)),0);
+  const orderId = 'ORD' + Date.now();
+  const currentUser = localStorage.getItem('currentUserEmail') || '';
+  const order = {
+    id: orderId,
+    date: new Date().toISOString(),
+    items: cart,
+    total: sum,
+    status: 'new',
+    customer: { fullName, email, phone, address, city, postal, notes },
+    delivery, payment,
+    user: currentUser,
+    userEmail: currentUser || email
+  };
+  saveOrder(order);
+  saveCart([]);
+  closeOrderModal();
+  showToast('Заказ сохранён. Номер: ' + orderId);
+  renderCart();
+  setTimeout(()=> { alert('Заказ оформлен. Номер заказа: ' + orderId); }, 200);
+}
+
+function showToast(text, timeout = 3000){
+  const t = document.getElementById('toast'); t.innerText = text; t.style.display = 'block';
+  clearTimeout(t._timer); t._timer = setTimeout(()=> { t.style.display = 'none'; }, timeout);
+}
+
+document.getElementById('applyPromo').addEventListener('click', applyPromo);
+document.getElementById('clearCart').addEventListener('click', clearCart);
+document.getElementById('checkout').addEventListener('click', openOrderModal);
+document.getElementById('continue').addEventListener('click', ()=> location.href = 'catalog.html');
+document.getElementById('cancelOrder').addEventListener('click', closeOrderModal);
+document.getElementById('orderForm').addEventListener('submit', submitOrderForm);
+window.addEventListener('storage', ()=> renderCart());
+
+(function initDemoIfEmpty(){
+  const cart = loadCart(); 
+  if(cart.length) return;
+  saveCart([]); 
+})();
+renderCart();
+</script>
+
+
+<script>
+(function(){
+  const THEME_KEY = 'siteTheme';
+  const themeBtn = document.getElementById('themeToggle');
+  const searchBtn = document.getElementById('searchBtn');
+  const globalSearch = document.getElementById('globalSearch');
+
+  function updateThemeButton(){
+    if(!themeBtn) return;
+    const isLight = document.body.classList.contains('light');
+    themeBtn.textContent = isLight ? '🌞' : '🌙';
+    themeBtn.setAttribute('aria-pressed', String(isLight));
+  }
+
+  function initTheme(){
+    const t = localStorage.getItem(THEME_KEY) || 'dark';
+    document.body.classList.toggle('light', t === 'light');
+    updateThemeButton();
+  }
+
+  function toggleTheme(){
+    const isLightNow = document.body.classList.toggle('light');
+    localStorage.setItem(THEME_KEY, isLightNow ? 'light' : 'dark');
+    updateThemeButton();
+  }
+
+  if(themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
+  function doHeaderSearch(){
+    const q = (globalSearch && globalSearch.value || '').trim();
+    const url = new URL('catalog.html', location.href);
+    if(q) url.searchParams.set('q', q);
+    location.href = url.toString();
+  }
+
+  if(searchBtn && globalSearch){
+    searchBtn.addEventListener('click', doHeaderSearch);
+    globalSearch.addEventListener('keydown', function(e){
+      if(e.key === 'Enter') doHeaderSearch();
+    });
+
+    try{
+      const params = new URLSearchParams(location.search);
+      const q = params.get('q') || params.get('search') || '';
+      if(q) globalSearch.value = q;
+    }catch(e){}
+  }
+
+  initTheme();
+})();
+</script>
+
+</body>
+</html>

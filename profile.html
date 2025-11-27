@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Профиль | ShopElectro</title>
+<style>
+:root{
+  --bg:#121212; --panel:#1e1e1e; --muted:#2a2a2a; --accent:#ff6600; --text:#eaeaea; --mutedText:#bfbfbf;
+}
+body.light{ --bg:#f6f6f6; --panel:#ffffff; --muted:#efefef; --text:#111111; --mutedText:#6b6b6b; }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased;
+  transition:background .22s,color .22s;
+}
+a{color:inherit;text-decoration:none}
+.header{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; gap:12px;
+  padding:12px 20px; background:var(--panel);
+  box-shadow:0 1px 0 rgba(0,0,0,0.35);
+}
+.header-left{display:flex;align-items:center;gap:12px}
+.home-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;font-size:20px}
+.logo{font-weight:700;font-size:1.05rem}
+.search{flex:1;max-width:720px;display:flex;gap:8px;align-items:center}
+.search input{width:100%;padding:10px;border-radius:10px;border:none;background:var(--muted);color:var(--text)}
+.search button{height:40px;padding:8px 10px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.nav{display:flex;gap:10px;align-items:center}
+.nav button{background:var(--muted);border:none;padding:8px 14px;border-radius:10px;color:var(--text);cursor:pointer}
+.nav button.active{background:var(--accent);color:#111;font-weight:700}
+#themeToggle{width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.hamburger{display:none}
+.container{max-width:1200px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start}
+.card{background:var(--panel);border-radius:14px;padding:20px}
+.profile-header{display:flex;gap:16px;align-items:center}
+.avatar{width:104px;height:104px;border-radius:12px;background:#222;display:flex;align-items:center;justify-content:center;font-size:40px;color:#aaa}
+.user-info{flex:1}
+.user-info h2{margin:0;font-size:1.4rem}
+.user-meta{color:var(--mutedText);margin-top:6px;font-size:0.95rem}
+.form-field{margin-bottom:12px}
+.form-field label{display:block;font-size:0.9rem;color:#cfcfcf;margin-bottom:6px}
+.form-field input, .form-field select, .form-field textarea{width:100%;padding:10px;border-radius:8px;border:none;background:var(--muted);color:var(--text)}
+.form-actions{display:flex;gap:10px;margin-top:12px}
+.stats{display:flex;gap:12px;margin-top:16px}
+.stat{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;flex:1;text-align:center}
+.stat h3{margin:0;font-size:1.1rem}
+.small{font-size:0.9rem;color:var(--mutedText)}
+.right-col{display:flex;flex-direction:column;gap:18px}
+.panel-title{font-weight:800;margin-bottom:8px}
+.btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
+.btn-primary{background:var(--accent);color:#111}
+.btn-ghost{background:var(--muted);color:var(--text)}
+.history { background:var(--panel); border-radius:12px; padding:14px; }
+.history .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.history select, .history input[type="date"], .history input[type="text"], .history select.pageSize {
+  padding:8px;border-radius:8px;border:none;background:var(--muted);color:var(--text);
+}
+.history table{width:100%;border-collapse:collapse}
+.history th, .history td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03); text-align:left}
+.history th{color:var(--mutedText); font-weight:700; font-size:0.9rem}
+.status-pill{padding:6px 8px;border-radius:999px;font-weight:700; font-size:0.85rem}
+.status-new{background:rgba(255,166,77,0.12);color:var(--accent)}
+.status-paid{background:rgba(77,192,128,0.12);color:#4dc080}
+.status-shipped{background:rgba(102,153,255,0.08);color:#6699ff}
+.status-cancel{background:rgba(255,80,80,0.08);color:#ff5050}
+.pager{display:flex;gap:6px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.page-btn{padding:8px 10px;border-radius:8px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.page-btn.active{background:var(--accent);color:#111}
+.modal{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.98);
+  background:var(--panel);padding:18px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  max-width:820px;width:92%;max-height:80vh;overflow:auto;opacity:0;pointer-events:none;transition:all .18s;
+  z-index:9999;
+}
+.modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.modal h3{margin:0 0 8px}
+.modal pre{background:rgba(0,0,0,0.05);padding:10px;border-radius:8px;color:var(--mutedText);overflow:auto}
+@media (max-width:980px){
+  .container{grid-template-columns:1fr;padding:18px}
+  .nav{display:none}
+  .hamburger{display:inline-flex}
+  .history table, .history thead, .history tbody, .history th, .history td, .history tr { display:block; }
+  .history tr { margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:12px; }
+  .history th { display:none; }
+  .history td { display:flex; justify-content:space-between; gap:10px; padding:8px 0; }
+  .history td::before { content: attr(data-label); color:var(--mutedText); margin-right:8px; width:40%; flex:0 0 40%; text-align:left; }
+}
+</style>
+</head>
+<body>
+
+<header class="header" role="banner">
+  <div class="header-left">
+    <a class="home-icon" href="index.html" title="Главная">🏠</a>
+    <div class="logo">ShopElectro</div>
+  </div>
+
+  <div class="search" role="search">
+    <input id="globalSearch" placeholder="Поиск по товарам..." aria-label="Поиск" />
+    <button id="searchBtn" title="Искать">🔎</button>
+  </div>
+
+  <nav class="nav" role="navigation" aria-label="Главная навигация">
+    <a href="catalog.html"><button>Каталог</button></a>
+    <a href="profile.html"><button class="active">Профиль</button></a>
+    <a href="orders.html"><button>Корзина</button></a>
+    <a href="reviews.html"><button>Отзывы</button></a>
+    <a href="company.html"><button>Компания</button></a>
+  </nav>
+
+  <button id="themeToggle" title="Переключить тему" aria-pressed="false">🌓</button>
+</header>
+
+<div class="container" role="main">
+  <div>
+    <div class="card">
+      <div class="profile-header">
+        <div id="avatar" class="avatar">👤</div>
+        <div class="user-info">
+          <h2 id="displayName">Гость</h2>
+          <div class="user-meta" id="userEmail">Войдите или создайте аккаунт, чтобы сохранить заказы и профиль</div>
+          <div style="margin-top:12px">
+            <button id="logoutBtn" class="btn btn-ghost" style="display:none">Выйти</button>
+            <a id="toOrders" href="orders.html" style="text-decoration:none"><button class="btn btn-primary" style="margin-left:8px">Мои заказы</button></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats" id="userStats" style="display:none">
+        <div class="stat"><h3 id="ordersCount">0</h3><div class="small">Заказов</div></div>
+        <div class="stat"><h3 id="totalSum">₸ 0</h3><div class="small">Потрачено</div></div>
+        <div class="stat"><h3 id="savedItems">0</h3><div class="small">Сохранено</div></div>
+      </div>
+
+      <div class="orders" id="recentOrdersWrap" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Последние заказы</strong>
+          <a id="allOrdersLink" href="#history" class="small" style="text-decoration:none;color:var(--mutedText)">История заказов</a>
+        </div>
+        <div id="recentOrders"></div>
+      </div>
+
+      <div class="small" style="margin-top:14px">Советы по безопасности: не используйте один пароль на разных сайтах, подтверждайте личные данные только по официальным каналам.</div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="panel-title">Контактная информация</div>
+      <div class="form-field"><label>Телефон</label><input id="phoneDisplay" readonly /></div>
+      <div class="form-field"><label>Адрес доставки</label><input id="addressDisplay" readonly /></div>
+      <div class="form-field"><label>Способ оплаты</label><input id="payDisplay" readonly /></div>
+      <a href="orders.html" class="btn btn-ghost" style="text-decoration:none">История заказов</a>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="card">
+      <div class="panel-title">Войти в аккаунт</div>
+      <div class="form-field">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="text" placeholder="email@example.com" />
+      </div>
+      <div class="form-field">
+        <label for="loginPass">Пароль</label>
+        <input id="loginPass" type="password" placeholder="••••••••" />
+      </div>
+      <div style="display:flex;gap:10px">
+        <button id="loginBtn" class="btn btn-primary">Войти</button>
+        <button id="openRegister" class="btn btn-ghost">Регистрация</button>
+      </div>
+      <div class="small" style="margin-top:10px">Забыли пароль? Сброс через email (заглушка).</div>
+    </div>
+
+    <div id="registerCard" class="card" style="display:none">
+      <div class="panel-title">Создать аккаунт</div>
+      <div class="form-field">
+        <label for="regName">Полное имя</label>
+        <input id="regName" type="text" placeholder="Иван Иванов" />
+      </div>
+      <div class="form-field">
+        <label for="regEmail">Email</label>
+        <input id="regEmail" type="email" placeholder="email@example.com" />
+      </div>
+      <div class="form-field">
+        <label for="regPass">Пароль</label>
+        <input id="regPass" type="password" placeholder="Минимум 6 символов" />
+      </div>
+      <div class="form-field">
+        <label for="regPhone">Телефон</label>
+        <input id="regPhone" type="text" placeholder="+7 (700) 000-00-00" />
+      </div>
+      <div class="form-field">
+        <label for="regAddress">Адрес доставки</label>
+        <input id="regAddress" type="text" placeholder="Город, улица, дом" />
+      </div>
+      <div class="form-actions">
+        <button id="registerBtn" class="btn btn-primary">Создать аккаунт</button>
+        <button id="cancelRegister" class="btn btn-ghost">Отмена</button>
+      </div>
+      <div class="small" style="margin-top:10px">Регистрация создаёт локальный аккаунт в браузере.</div>
+    </div>
+
+    <div class="card" id="editCard" style="display:none">
+      <div class="panel-title">Редактировать профиль</div>
+      <div class="form-field">
+        <label>Имя</label><input id="editName" type="text" />
+      </div>
+      <div class="form-field">
+        <label>Телефон</label><input id="editPhone" type="text" />
+      </div>
+      <div class="form-field">
+        <label>Адрес</label><input id="editAddress" type="text" />
+      </div>
+      <div style="display:flex;gap:10px">
+        <button id="saveProfile" class="btn btn-primary">Сохранить</button>
+        <button id="cancelEdit" class="btn btn-ghost">Отмена</button>
+      </div>
+    </div>
+
+    <div class="card history" id="history">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:800">История заказов</div>
+          <div class="small" style="margin-top:6px">Фильтруйте, ищите и просматривайте детали ваших заказов</div>
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:12px">
+        <select id="statusFilter"><option value="all">Все статусы</option><option value="new">Новый</option><option value="paid">Оплачен</option><option value="shipped">Отправлен</option><option value="cancelled">Отменён</option></select>
+        <input type="date" id="dateFrom" title="Дата от" />
+        <input type="date" id="dateTo" title="Дата до" />
+        <input type="text" id="historySearch" placeholder="Поиск: номер, товар" style="min-width:220px" />
+        <select id="pageSize" class="pageSize" title="Записей на страницу"><option>5</option><option selected>10</option><option>20</option></select>
+        <button id="clearFilters" class="btn btn-ghost">Сброс</button>
+        <button id="refreshHistory" class="btn btn-ghost">Обновить</button>
+      </div>
+
+      <div style="margin-top:12px;overflow-x:auto">
+        <table id="historyTable" style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr>
+              <th>Номер / Дата</th>
+              <th>Товары</th>
+              <th>Сумма</th>
+              <th>Статус</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+
+      <div class="pager" id="pager" style="justify-content:flex-end"></div>
+      <div id="noHistory" class="small" style="display:none;margin-top:12px;color:var(--mutedText)">Нет заказов для отображения.</div>
+    </div>
+
+  </div>
+</div>
+
+
+<div id="orderModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <h3 id="orderModalTitle">Заказ</h3>
+  <div id="orderModalBody"></div>
+  <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+    <button id="cancelOrderBtn" class="btn btn-ghost">Отменить заказ</button>
+    <button id="reorderBtn" class="btn btn-primary">Повторить заказ</button>
+    <button id="orderModalClose" class="btn btn-ghost">Закрыть</button>
+  </div>
+</div>
+
+<script>
+const USERS_KEY = 'shopUsers';
+const CURR_KEY = 'currentUserEmail';
+const ORDERS_KEY = 'orders';
+const CART_KEY = 'shopCart';
+function $(id){ return document.getElementById(id); }
+function loadJSON(key){ try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : []; }catch(e){return [];} }
+function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); window.dispatchEvent(new Event('storage')); }
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatDate(iso){ try{ const d=new Date(iso); return d.toLocaleString('ru-RU', {year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ return iso; } }
+function statusClass(s){
+  if(s==='new') return 'status-pill status-new';
+  if(s==='paid') return 'status-pill status-paid';
+  if(s==='shipped') return 'status-pill status-shipped';
+  if(s==='cancelled') return 'status-pill status-cancel';
+  return 'status-pill';
+}
+let historyState = { page: 1, pageSize: 10, filterStatus: 'all', q: '', dateFrom: '', dateTo: '' };
+function init(){
+  wireAuthUI();
+  initTheme();
+  wireHeaderSearch();
+  wireHistoryControls();
+  renderProfileUI();
+  renderHistory();
+  window.addEventListener('storage', ()=> { renderProfileUI(); renderHistory(); });
+}
+function getCurrentEmail(){ return localStorage.getItem(CURR_KEY) || ''; }
+function loadUsers(){ return loadJSON(USERS_KEY); }
+function loadOrders(){ return loadJSON(ORDERS_KEY); }
+function renderProfileUI(){
+  const users = loadUsers();
+  const curr = getCurrentEmail();
+  const user = users.find(u => u.email === curr);
+  if(user) showLoggedUI(user); else showGuestUI();
+}
+function showLoggedUI(user){
+  $('displayName').innerText = user.name || user.email;
+  $('userEmail').innerText = user.email || '';
+  $('avatar').innerText = user.name ? user.name.trim()[0].toUpperCase() : '👤';
+  $('logoutBtn').style.display = 'inline-block';
+  $('userStats').style.display = 'flex';
+  $('recentOrdersWrap').style.display = 'block';
+  $('editCard').style.display = 'block';
+  $('phoneDisplay').value = user.phone || '';
+  $('addressDisplay').value = user.address || '';
+  $('payDisplay').value = 'Картой / Наличными';
+  $('editName').value = user.name || '';
+  $('editPhone').value = user.phone || '';
+  $('editAddress').value = user.address || '';
+  const allOrders = loadOrders();
+  const myOrders = allOrders.filter(o => {
+    const email = (o.user || o.userEmail || (o.customer && o.customer.email) || '').toString().toLowerCase();
+    return email === (user.email || '').toLowerCase();
+  });
+  $('ordersCount').innerText = myOrders.length;
+  const total = myOrders.reduce((s,i)=>s + (Number(i.total||0)), 0);
+  $('totalSum').innerText = '₸ ' + total.toLocaleString('ru-RU');
+  const recentWrap = $('recentOrders');
+  recentWrap.innerHTML = '';
+  myOrders.slice(0,3).forEach(o => {
+    const div = document.createElement('div');
+    div.className = 'order-item';
+    const thumb = (o.items && o.items[0] && o.items[0].img) ? `background-image:url('${o.items[0].img}');background-size:cover;background-position:center;` : '';
+    div.innerHTML = `<div class="order-thumb" style="${thumb}"></div>
+      <div class="order-info"><h4>№ ${escapeHtml(o.id)}</h4><p>Сумма: ₸ ${Number(o.total||0).toLocaleString('ru-RU')} • Статус: ${escapeHtml(o.status||'')}</p></div>
+      <div style="margin-left:auto"><button class="btn btn-ghost view-order-btn" data-id="${escapeHtml(o.id)}">Подробнее</button></div>`;
+    recentWrap.appendChild(div);
+  });
+  recentWrap.querySelectorAll('.view-order-btn').forEach(b => b.addEventListener('click', e => openOrderModal(e.currentTarget.dataset.id)));
+}
+function showGuestUI(){
+  $('displayName').innerText = 'Гость';
+  $('userEmail').innerText = 'Войдите или создайте аккаунт';
+  $('avatar').innerText = '👤';
+  $('logoutBtn').style.display = 'none';
+  $('userStats').style.display = 'none';
+  $('recentOrdersWrap').style.display = 'none';
+  $('editCard').style.display = 'none';
+}
+function wireAuthUI(){
+  $('loginBtn').addEventListener('click', ()=> {
+    const email = $('loginEmail').value.trim().toLowerCase();
+    const pass = $('loginPass').value;
+    if(!email || !pass){ alert('Введите email и пароль'); return; }
+    const users = loadUsers();
+    const u = users.find(x => x.email === email && x.pass === pass);
+    if(!u){ alert('Пользователь не найден или неверный пароль'); return; }
+    localStorage.setItem(CURR_KEY, u.email);
+    location.reload();
+  });
+  $('openRegister').addEventListener('click', ()=> { $('registerCard').style.display = 'block'; window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'}); });
+  $('cancelRegister').addEventListener('click', ()=> { $('registerCard').style.display = 'none'; });
+  $('registerBtn').addEventListener('click', ()=> {
+    const name = $('regName').value.trim();
+    const email = $('regEmail').value.trim().toLowerCase();
+    const pass = $('regPass').value;
+    if(!name || !email || !pass){ alert('Заполните имя, email и пароль'); return; }
+    if(pass.length < 6){ alert('Пароль должен быть не менее 6 символов'); return; }
+    const users = loadUsers();
+    if(users.find(u=>u.email===email)){ alert('Пользователь с таким email уже существует'); return; }
+    users.push({ id: Date.now(), name, email, pass, phone: $('regPhone').value.trim(), address: $('regAddress').value.trim(), recentOrders: [] });
+    saveJSON(USERS_KEY, users);
+    localStorage.setItem(CURR_KEY, email);
+    alert('Аккаунт создан и вы вошли');
+    location.reload();
+  });
+  $('logoutBtn').addEventListener('click', ()=> { localStorage.removeItem(CURR_KEY); location.reload(); });
+  $('saveProfile').addEventListener('click', ()=> {
+    const email = getCurrentEmail();
+    if(!email){ alert('Нет авторизованного пользователя'); return; }
+    const users = loadUsers();
+    const idx = users.findIndex(u=>u.email===email);
+    if(idx===-1){ alert('Пользователь не найден'); return; }
+    users[idx].name = $('editName').value.trim();
+    users[idx].phone = $('editPhone').value.trim();
+    users[idx].address = $('editAddress').value.trim();
+    saveJSON(USERS_KEY, users);
+    alert('Профиль сохранён');
+    location.reload();
+  });
+  $('cancelEdit').addEventListener('click', ()=> location.reload());
+}
+function wireHeaderSearch(){
+  const gs = $('globalSearch');
+  const btn = $('searchBtn');
+  function goSearch(){
+    const q = (gs.value || '').trim();
+    const url = new URL('catalog.html', location.href);
+    if(q) url.searchParams.set('q', q);
+    location.href = url.toString();
+  }
+  gs.addEventListener('keydown', (e)=>{ if(e.key==='Enter') goSearch(); });
+  btn.addEventListener('click', goSearch);
+  (function(){
+    try{
+      const p = new URLSearchParams(location.search);
+      const q = p.get('q') || p.get('search') || '';
+      if(q) gs.value = q;
+    }catch(e){}
+  })();
+}
+function initTheme(){
+  const THEME_KEY = 'siteTheme';
+  const btn = $('themeToggle');
+  function update(){ btn.textContent = document.body.classList.contains('light') ? '🌞' : '🌙'; }
+  (function initVal(){ const t = localStorage.getItem(THEME_KEY) || 'dark'; document.body.classList.toggle('light', t==='light'); update(); })();
+  btn.addEventListener('click', ()=> {
+    document.body.classList.toggle('light');
+    localStorage.setItem(THEME_KEY, document.body.classList.contains('light') ? 'light' : 'dark');
+    update();
+  });
+}
+function wireHistoryControls(){
+  $('statusFilter').addEventListener('change', ()=> { historyState.filterStatus = $('statusFilter').value; historyState.page = 1; renderHistory(); });
+  $('dateFrom').addEventListener('change', ()=> { historyState.dateFrom = $('dateFrom').value; historyState.page = 1; renderHistory(); });
+  $('dateTo').addEventListener('change', ()=> { historyState.dateTo = $('dateTo').value; historyState.page = 1; renderHistory(); });
+  $('historySearch').addEventListener('input', ()=> { historyState.q = $('historySearch').value.trim(); historyState.page = 1; renderHistory(); });
+  $('pageSize').addEventListener('change', ()=> { historyState.pageSize = parseInt($('pageSize').value || 10, 10); historyState.page = 1; renderHistory(); });
+  $('clearFilters').addEventListener('click', ()=> {
+    $('statusFilter').value = 'all'; $('dateFrom').value = ''; $('dateTo').value = ''; $('historySearch').value = ''; $('pageSize').value = '10';
+    historyState = { page:1, pageSize:10, filterStatus:'all', q:'', dateFrom:'', dateTo:'' };
+    renderHistory();
+  });
+  $('refreshHistory').addEventListener('click', ()=> renderHistory());
+  $('orderModalClose').addEventListener('click', closeOrderModal);
+  $('reorderBtn').addEventListener('click', ()=> {
+    const id = $('orderModal').dataset.orderId;
+    if(id) reorderOrder(id);
+  });
+  $('cancelOrderBtn').addEventListener('click', ()=> {
+    const id = $('orderModal').dataset.orderId;
+    if(!id) return;
+    if(!confirm('Отменить заказ?')) return;
+    changeOrderStatus(id, 'cancelled');
+    closeOrderModal();
+  });
+}
+function filterOrdersForUserRaw(all, email){
+  if(!email) return [];
+  const e = email.toLowerCase();
+  return all.filter(o => {
+    const candidates = [
+      (o.user || ''),
+      (o.userEmail || ''),
+      ((o.customer && o.customer.email) || ''),
+      ((o.customer && o.customer.user) || ''),
+      ((o.user && o.user.email) || '')
+    ];
+    return candidates.some(c => String(c || '').toLowerCase() === e);
+  });
+}
+function renderHistory(){
+  const tbody = $('historyBody');
+  const noHistory = $('noHistory');
+  tbody.innerHTML = '';
+  const curr = getCurrentEmail();
+  if(!curr){ noHistory.style.display = 'block'; return; }
+  let all = loadOrders();
+  let my = filterOrdersForUserRaw(all, curr);
+  const st = historyState.filterStatus || 'all';
+  if(st !== 'all') my = my.filter(o => (o.status || '') === st);
+  if(historyState.dateFrom){
+    const f = new Date(historyState.dateFrom + 'T00:00:00');
+    my = my.filter(o => new Date(o.date) >= f);
+  }
+  if(historyState.dateTo){
+    const t = new Date(historyState.dateTo + 'T23:59:59');
+    my = my.filter(o => new Date(o.date) <= t);
+  }
+  if(historyState.q){
+    const q = historyState.q.toLowerCase();
+    my = my.filter(o => {
+      const items = (o.items || []).map(i => i.name).join(' ').toLowerCase();
+      return (o.id + ' ' + items + ' ' + (o.status||'')).toLowerCase().includes(q);
+    });
+  }
+  if(!my.length){ noHistory.style.display = 'block'; $('pager').innerHTML = ''; return; }
+  noHistory.style.display = 'none';
+  const pageSize = historyState.pageSize || parseInt($('pageSize').value || 10,10);
+  const totalPages = Math.max(1, Math.ceil(my.length / pageSize));
+  if(historyState.page > totalPages) historyState.page = totalPages;
+  const start = (historyState.page - 1) * pageSize;
+  const pageSlice = my.slice(start, start + pageSize);
+  pageSlice.forEach(o => {
+    const tr = document.createElement('tr');
+    const itemsText = (o.items || []).map(it => `${escapeHtml(it.name)} ×${it.qty||1}`).join('; ');
+    tr.innerHTML = `
+      <td data-label="Номер/Дата"><strong>${escapeHtml(o.id)}</strong><div class="small">${formatDate(o.date)}</div></td>
+      <td data-label="Товары">${itemsText}</td>
+      <td data-label="Сумма">₸ ${Number(o.total||0).toLocaleString('ru-RU')}</td>
+      <td data-label="Статус"><span class="${statusClass(o.status)}">${escapeHtml(o.status||'')}</span></td>
+      <td data-label="Действия" style="white-space:nowrap">
+        <button class="btn btn-ghost viewBtn" data-id="${escapeHtml(o.id)}">Подробнее</button>
+        ${ (o.status !== 'cancelled') ? `<button class="btn btn-ghost cancelBtn" data-id="${escapeHtml(o.id)}" style="margin-left:8px">Отменить</button>` : '' }
+        <button class="btn btn-primary reorderBtn" data-id="${escapeHtml(o.id)}" style="margin-left:8px">Повторить</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  renderPager(totalPages, historyState.page);
+  tbody.querySelectorAll('.viewBtn').forEach(b => b.addEventListener('click', e => openOrderModal(e.currentTarget.dataset.id)));
+  tbody.querySelectorAll('.cancelBtn').forEach(b => b.addEventListener('click', e => {
+    const id = e.currentTarget.dataset.id;
+    if(!confirm('Вы действительно хотите отменить заказ ' + id + '?')) return;
+    changeOrderStatus(id, 'cancelled');
+  }));
+  tbody.querySelectorAll('.reorderBtn').forEach(b => b.addEventListener('click', e => reorderOrder(e.currentTarget.dataset.id)));
+}
+function renderPager(totalPages, current){
+  const pager = $('pager');
+  pager.innerHTML = '';
+  if(totalPages <= 1) return;
+  const prev = document.createElement('button'); prev.className='page-btn'; prev.textContent='‹'; prev.disabled = current===1;
+  prev.addEventListener('click', ()=> { historyState.page = Math.max(1, historyState.page - 1); renderHistory(); });
+  pager.appendChild(prev);
+  const maxButtons = 7;
+  let start = Math.max(1, current - Math.floor(maxButtons/2));
+  let end = Math.min(totalPages, start + maxButtons - 1);
+  if(end - start < maxButtons -1) start = Math.max(1, end - maxButtons +1);
+  for(let i=start;i<=end;i++){
+    const b = document.createElement('button'); b.className='page-btn' + (i===current ? ' active' : ''); b.textContent = i;
+    b.addEventListener('click', ()=> { historyState.page = i; renderHistory(); });
+    pager.appendChild(b);
+  }
+  const next = document.createElement('button'); next.className='page-btn'; next.textContent='›'; next.disabled = current===totalPages;
+  next.addEventListener('click', ()=> { historyState.page = Math.min(totalPages, historyState.page + 1); renderHistory(); });
+  pager.appendChild(next);
+}
+function openOrderModal(id){
+  const all = loadOrders();
+  const o = all.find(x => String(x.id) === String(id));
+  if(!o) return alert('Заказ не найден');
+  const body = $('orderModalBody');
+  $('orderModal').dataset.orderId = o.id;
+  const customerEmail = (o.userEmail || (o.customer && o.customer.email) || o.user || '');
+  const customerName = (o.customer && o.customer.fullName) || o.name || o.user || '';
+  const itemsHtml = (o.items || []).map(it => `<li>${escapeHtml(it.name)} — ${it.qty||1} × ${Number(it.price||0).toLocaleString('ru-RU')} ₸</li>`).join('');
+  body.innerHTML = `
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1">
+        <div><strong>Клиент:</strong> ${escapeHtml(customerName)}</div>
+        <div><strong>Email:</strong> ${escapeHtml(customerEmail)}</div>
+        <div><strong>Дата:</strong> ${formatDate(o.date)}</div>
+        <div><strong>Статус:</strong> <span class="${statusClass(o.status)}">${escapeHtml(o.status||'')}</span></div>
+      </div>
+      <div style="min-width:200px">
+        <div style="font-weight:800">Сумма: ₸ ${Number(o.total||0).toLocaleString('ru-RU')}</div>
+        <div style="color:var(--mutedText);margin-top:6px">${escapeHtml(o.note || (o.customer && o.customer.notes) || '')}</div>
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0" />
+    <div><strong>Товары:</strong><ul style="margin:8px 0 0 18px">${itemsHtml}</ul></div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0" />
+    <div><strong>Полные данные (JSON):</strong><pre>${escapeHtml(JSON.stringify(o, null, 2))}</pre></div>
+  `;
+  $('cancelOrderBtn').style.display = (o.status !== 'cancelled') ? 'inline-block' : 'none';
+  const modal = $('orderModal'); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+}
+function closeOrderModal(){ const m = $('orderModal'); m.classList.remove('show'); m.setAttribute('aria-hidden','true'); delete m.dataset.orderId; }
+function changeOrderStatus(id, newStatus){
+  const arr = loadOrders();
+  const idx = arr.findIndex(x => String(x.id) === String(id));
+  if(idx === -1) return alert('Заказ не найден');
+  arr[idx].status = newStatus;
+  saveJSON(ORDERS_KEY, arr);
+  alert('Статус заказа обновлён: ' + newStatus);
+  renderHistory();
+  renderProfileUI();
+}
+function reorderOrder(id){
+  const arr = loadOrders();
+  const o = arr.find(x => String(x.id) === String(id));
+  if(!o) return alert('Заказ не найден');
+  const cart = loadJSON(CART_KEY);
+  (o.items || []).forEach(it => {
+    const i = cart.find(x => String(x.id) === String(it.id));
+    if(i) i.qty = (i.qty||0) + (it.qty||1);
+    else cart.push({ id: it.id, name: it.name, price: it.price||0, img: it.img||'', qty: it.qty||1, brand: it.brand||'' });
+  });
+  saveJSON(CART_KEY, cart);
+  alert('Товары добавлены в корзину');
+}
+(function seedOrdersIfEmpty(){
+  const all = loadOrders();
+  if(all && all.length) return;
+  const now = Date.now();
+  const demo = [
+    { id:'ORD'+(now-3600*1000), date:new Date(now-3600*1000).toISOString(), user:'ivan@example.com', customer:{fullName:'Иван Иванов', email:'ivan@example.com'}, items:[{id:1,name:'Игровая мышь GX100',price:1490,qty:1}], total:1490, status:'new', note:'' },
+    { id:'ORD'+(now-86400*1000), date:new Date(now-86400*1000).toISOString(), user:'anna@example.com', customer:{fullName:'Анна П.', email:'anna@example.com'}, items:[{id:5,name:'Клавиатура Mechanical Pro',price:3590,qty:1}], total:3590, status:'paid', note:'Оплачено' }
+  ];
+  saveJSON(ORDERS_KEY, demo);
+})();
+init();
+</script>
+</body>
+</html>

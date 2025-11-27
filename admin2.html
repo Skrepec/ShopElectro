@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin — Заказы | ShopElectro</title>
+<style>
+:root{
+  --bg:#121212; --panel:#1e1e1e; --muted:#2a2a2a; --accent:#ff6600; --text:#e6e6e6; --mutedText:#bfbfbf;
+}
+body.light{ --bg:#f6f6f6; --panel:#ffffff; --muted:#efefef; --text:#111111; --mutedText:#6b6b6b; }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial; background:var(--bg); color:var(--text);
+  -webkit-font-smoothing:antialiased; transition:background .22s,color .22s;
+}
+.header{
+  position:sticky; top:0; z-index:60; display:flex; align-items:center; gap:12px; padding:12px 18px;
+  background:var(--panel); box-shadow:0 1px 0 rgba(0,0,0,0.35);
+}
+.header-left{display:flex;align-items:center;gap:12px}
+.home-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;font-size:20px}
+.logo{font-weight:700}
+.search{flex:1;max-width:700px;display:flex;gap:8px;align-items:center}
+.search input{width:100%;padding:10px;border-radius:10px;border:none;background:var(--muted);color:var(--text)}
+.search button{height:40px;padding:8px 10px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+#themeToggle{width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.container{max-width:1200px;margin:20px auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.controls select, .controls input[type="date"], .controls input[type="text"]{
+  padding:8px 10px;border-radius:8px;border:none;background:var(--muted);color:var(--text);
+}
+.controls button{padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#111;cursor:pointer;font-weight:700}
+.controls .ghost{background:var(--muted);color:var(--text)}
+.table-wrap{overflow-x:auto;background:transparent;border-radius:12px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
+th{color:var(--mutedText);font-weight:700}
+.status-pill{padding:6px 8px;border-radius:999px;font-weight:700;display:inline-block}
+.status-new{background:rgba(255,166,77,0.12);color:var(--accent)}
+.status-paid{background:rgba(77,192,128,0.12);color:#4dc080}
+.status-shipped{background:rgba(102,153,255,0.08);color:#6699ff}
+.status-cancel{background:rgba(255,80,80,0.08);color:#ff5050}
+.modal{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.98);
+  background:var(--panel);padding:18px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  max-width:920px;width:94%;max-height:86vh;overflow:auto;opacity:0;pointer-events:none;transition:all .18s;
+  z-index:9999;
+}
+.modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.modal h3{margin:0 0 12px}
+.modal .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.modal pre{background:rgba(0,0,0,0.05);padding:10px;border-radius:8px;color:var(--mutedText);overflow:auto}
+.empty{padding:40px;text-align:center;color:var(--mutedText);background:var(--panel);border-radius:12px}
+@media(max-width:900px){
+  th:nth-child(3), td:nth-child(3){display:none}
+}
+</style>
+</head>
+<body>
+<header class="header" role="banner">
+  <div class="header-left">
+    <a class="home-icon" href="index.html" title="Главная">🏠</a>
+    <div class="logo">ShopElectro — Админ</div>
+  </div>
+  <div class="search" role="search" style="margin-right:12px">
+    <input id="globalSearch" placeholder="Поиск по заказам: номер, email, имя, товар..." />
+    <button id="searchBtn" title="Искать">🔎</button>
+  </div>
+  <button id="themeToggle" title="Переключить тему">🌓</button>
+</header>
+
+<main class="container" role="main">
+  <div class="controls" aria-hidden="false">
+    <select id="statusFilter" title="Фильтр по статусу">
+      <option value="all">Все статусы</option>
+      <option value="new">Новый</option>
+      <option value="paid">Оплачен</option>
+      <option value="shipped">Отправлен</option>
+      <option value="cancelled">Отменён</option>
+    </select>
+    <label style="display:inline-flex;align-items:center;gap:6px;color:var(--mutedText)">
+      с <input type="date" id="dateFrom" />
+    </label>
+    <label style="display:inline-flex;align-items:center;gap:6px;color:var(--mutedText)">
+      по <input type="date" id="dateTo" />
+    </label>
+    <input type="text" id="quickSearch" placeholder="Быстрый поиск по номеру/имени" style="min-width:240px" />
+    <button id="btnRefresh" class="ghost">Обновить</button>
+    <button id="btnExport">Экспорт CSV</button>
+    <button id="btnClearAll" class="ghost" title="Удалить все заказы (безвозвратно)">Очистить всё</button>
+  </div>
+
+  <div id="tableArea" class="table-wrap" role="region" aria-label="Список заказов"></div>
+  <div id="empty" class="empty" style="display:none">Заказов пока нет. Они создаются при оформлении заказа в приложении.</div>
+</main>
+
+<div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <h3 id="modalTitle">Заказ</h3>
+  <div id="modalBody"></div>
+  <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+    <button id="modalClose" class="ghost" style="padding:8px 10px;border-radius:8px;background:var(--muted);color:var(--text);border:none">Закрыть</button>
+  </div>
+</div>
+
+<script>
+const ORDERS_KEY = 'orders';
+function loadOrdersRaw(){ try{ const raw = localStorage.getItem(ORDERS_KEY); if(!raw) return []; return JSON.parse(raw); }catch(e){ return []; } }
+function saveOrdersRaw(arr){ localStorage.setItem(ORDERS_KEY, JSON.stringify(arr)); window.dispatchEvent(new Event('storage')); }
+function sampleOrdersIfEmpty(){
+  const cur = loadOrdersRaw();
+  if(cur.length) return;
+  const now = Date.now();
+  const sample = [
+    {
+      id: 'ORD' + (now - 600000),
+      date: new Date(now - 600000).toISOString(),
+      items: [{ id:1, name:'Игровая мышь GX100', price:1490, qty:1 }],
+      total: 1490,
+      status: 'new',
+      note: '',
+      customer: {
+        fullName: 'Иван Иванов',
+        email: 'ivan@example.com',
+        phone: '+7 701 000 0000',
+        address: 'ул. Ленина, д.1, кв.2',
+        city: 'Алматы',
+        postal: '050000',
+        notes: ''
+      },
+      delivery: 'courier',
+      payment: 'card'
+    },
+    {
+      id: 'ORD' + (now - 3600000),
+      date: new Date(now - 3600000).toISOString(),
+      items: [
+        { id:5, name:'Клавиатура Mechanical Pro', price:3590, qty:1 },
+        { id:4, name:'Мышь Compact Lite', price:990, qty:1 }
+      ],
+      total: 4580,
+      status: 'paid',
+      note: 'Оплачен картой',
+      customer: {
+        fullName: 'Анна Петрова',
+        email: 'anna@example.com',
+        phone: '+7 701 111 1111',
+        address: 'пр. Назарбаева, д.10',
+        city: 'Нур-Султан',
+        postal: '010000',
+        notes: 'Звонить за час'
+      },
+      delivery: 'pickup',
+      payment: 'card'
+    }
+  ];
+  saveOrdersRaw(sample);
+}
+function formatDate(iso){
+  try{ const d = new Date(iso); return d.toLocaleString('ru-RU', { year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' }); }catch(e){ return iso; }
+}
+function statusLabelClass(s){
+  if(s==='new') return 'status-pill status-new';
+  if(s==='paid') return 'status-pill status-paid';
+  if(s==='shipped') return 'status-pill status-shipped';
+  if(s==='cancelled') return 'status-pill status-cancel';
+  return 'status-pill';
+}
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderTable(){
+  const all = loadOrdersRaw().slice().sort((a,b)=> new Date(b.date) - new Date(a.date));
+  const statusFilter = document.getElementById('statusFilter').value;
+  const qGlobal = (document.getElementById('globalSearch').value || '').trim().toLowerCase();
+  const qQuick = (document.getElementById('quickSearch').value || '').trim().toLowerCase();
+  const from = document.getElementById('dateFrom').value;
+  const to = document.getElementById('dateTo').value;
+
+  let filtered = all.filter(o=>{
+    if(statusFilter !== 'all' && ((o.status||'') !== statusFilter)) return false;
+    if(qGlobal){
+      const text = (o.id + ' ' + (o.customer && o.customer.email || '') + ' ' + (o.customer && o.customer.fullName || '') + ' ' + (o.items||[]).map(i=>i.name).join(' ')).toLowerCase();
+      if(!text.includes(qGlobal)) return false;
+    }
+    if(qQuick){
+      const text = (o.id + ' ' + (o.customer && o.customer.fullName || '')).toLowerCase();
+      if(!text.includes(qQuick)) return false;
+    }
+    if(from){
+      const f = new Date(from + 'T00:00:00');
+      if(new Date(o.date) < f) return false;
+    }
+    if(to){
+      const t = new Date(to + 'T23:59:59');
+      if(new Date(o.date) > t) return false;
+    }
+    return true;
+  });
+
+  const area = document.getElementById('tableArea');
+  const empty = document.getElementById('empty');
+  if(!filtered.length){
+    area.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const rows = filtered.map(o=>{
+    const itemsText = (o.items || []).map(it => `${it.name} ×${it.qty||1}`).join('; ');
+    return `
+      <tr data-id="${escapeHtml(o.id)}">
+        <td style="min-width:200px"><strong>${escapeHtml(o.id)}</strong><div style="color:var(--mutedText);font-size:.9rem">${formatDate(o.date)}</div></td>
+        <td>${escapeHtml((o.customer && o.customer.fullName) || o.customer || '')}<div style="color:var(--mutedText);font-size:.85rem">${escapeHtml((o.customer && o.customer.email) || o.user || '')}</div></td>
+        <td style="max-width:380px">${escapeHtml(itemsText)}</td>
+        <td>${Number(o.total || 0).toLocaleString('ru-RU')} ₸</td>
+        <td><span class="${statusLabelClass(o.status)}">${escapeHtml(o.status || '')}</span></td>
+        <td style="white-space:nowrap">
+          <button class="viewBtn" data-id="${escapeHtml(o.id)}">Просмотр</button>
+          <select class="statusSelect" data-id="${escapeHtml(o.id)}" style="margin-left:8px">
+            <option value="new">Новый</option>
+            <option value="paid">Оплачен</option>
+            <option value="shipped">Отправлен</option>
+            <option value="cancelled">Отменён</option>
+          </select>
+          <button class="delBtn" data-id="${escapeHtml(o.id)}" style="margin-left:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px 8px;border-radius:8px">Удалить</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const table = `
+    <table role="table" aria-label="Таблица заказов">
+      <thead><tr>
+        <th>Номер / Дата</th>
+        <th>Клиент</th>
+        <th>Товары</th>
+        <th>Сумма</th>
+        <th>Статус</th>
+        <th>Действия</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+  area.innerHTML = table;
+
+  area.querySelectorAll('.viewBtn').forEach(b => b.addEventListener('click', (e)=> {
+    const id = e.currentTarget.dataset.id;
+    openModalFor(id);
+  }));
+  area.querySelectorAll('.delBtn').forEach(b => b.addEventListener('click', (e)=> {
+    const id = e.currentTarget.dataset.id;
+    if(!confirm('Удалить заказ ' + id + '?')) return;
+    deleteOrder(id);
+  }));
+  area.querySelectorAll('.statusSelect').forEach(s => {
+    const id = s.dataset.id;
+    const o = loadOrdersRaw().find(x=>String(x.id) === String(id));
+    if(o) s.value = o.status || 'new';
+    s.addEventListener('change', (e)=> {
+      changeStatus(id, e.target.value);
+    });
+  });
+}
+
+function openModalFor(id){
+  const orders = loadOrdersRaw();
+  const o = orders.find(x=>String(x.id) === String(id));
+  if(!o) return alert('Заказ не найден');
+  const modal = document.getElementById('modal');
+  const body = document.getElementById('modalBody');
+  const title = document.getElementById('modalTitle');
+  title.innerText = 'Заказ ' + o.id;
+  const itemsHtml = (o.items || []).map(it => `<li>${escapeHtml(it.name)} — ${it.qty || 1} × ${Number(it.price||0).toLocaleString('ru-RU')} ₸</li>`).join('');
+  const customer = o.customer || {};
+  body.innerHTML = `
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <div class="row"><strong>Клиент:</strong>&nbsp; ${escapeHtml(customer.fullName || o.customer || '')}</div>
+        <div class="row"><strong>Email:</strong>&nbsp; ${escapeHtml(customer.email || o.user || '')}</div>
+        <div class="row"><strong>Телефон:</strong>&nbsp; ${escapeHtml(customer.phone || '')}</div>
+        <div class="row"><strong>Адрес:</strong>&nbsp; ${escapeHtml(customer.address || '')}</div>
+        <div class="row"><strong>Город:</strong>&nbsp; ${escapeHtml(customer.city || '')}</div>
+        <div class="row"><strong>Индекс:</strong>&nbsp; ${escapeHtml(customer.postal || '')}</div>
+      </div>
+      <div style="min-width:260px">
+        <div class="row"><strong>Дата:</strong>&nbsp; ${formatDate(o.date)}</div>
+        <div class="row"><strong>Статус:</strong>&nbsp; <span class="${statusLabelClass(o.status)}">${escapeHtml(o.status || '')}</span></div>
+        <div class="row"><strong>Доставка:</strong>&nbsp; ${escapeHtml(o.delivery || '')}</div>
+        <div class="row"><strong>Оплата:</strong>&nbsp; ${escapeHtml(o.payment || '')}</div>
+        <div style="font-weight:800;margin-top:8px">Сумма: ${Number(o.total||0).toLocaleString('ru-RU')} ₸</div>
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0" />
+    <div>
+      <strong>Товары:</strong>
+      <ul style="margin:8px 0 0 18px">${itemsHtml}</ul>
+    </div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0" />
+    <div><strong>Комментарий:</strong><div style="color:var(--mutedText);margin-top:6px">${escapeHtml(o.note || customer.notes || '')}</div></div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0" />
+    <div><strong>Полные данные (JSON):</strong><pre>${escapeHtml(JSON.stringify(o, null, 2))}</pre></div>
+  `;
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+}
+
+function closeModal(){
+  const modal = document.getElementById('modal');
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
+}
+
+function deleteOrder(id){
+  let arr = loadOrdersRaw();
+  arr = arr.filter(x => String(x.id) !== String(id));
+  saveOrdersRaw(arr);
+  renderTable();
+}
+
+function changeStatus(id, newStatus){
+  const arr = loadOrdersRaw();
+  const idx = arr.findIndex(x => String(x.id) === String(id));
+  if(idx === -1) return;
+  arr[idx].status = newStatus;
+  saveOrdersRaw(arr);
+  renderTable();
+}
+
+function clearAllOrders(){
+  if(!confirm('Удалить все заказы? Это действие необратимо.')) return;
+  saveOrdersRaw([]);
+  renderTable();
+}
+
+function exportCSV(){
+  const arr = loadOrdersRaw();
+  if(!arr.length){ alert('Нет заказов для экспорта'); return; }
+  const rows = [];
+  rows.push(['id','date','customer_fullName','customer_email','customer_phone','delivery','payment','status','total','items','note']);
+  arr.forEach(o=>{
+    const itemsText = (o.items || []).map(i => `${i.name} x${i.qty||1} (${i.price}₸)`).join(' | ');
+    const customer = o.customer || {};
+    rows.push([o.id, o.date, customer.fullName || '', customer.email || '', customer.phone || '', o.delivery || '', o.payment || '', o.status || '', String(o.total || 0), itemsText, o.note || customer.notes || '']);
+  });
+  const csv = rows.map(r => r.map(cell => `"${String(cell || '').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'orders_export_' + (new Date()).toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('btnRefresh').addEventListener('click', renderTable);
+document.getElementById('btnClearAll').addEventListener('click', clearAllOrders);
+document.getElementById('btnExport').addEventListener('click', exportCSV);
+document.getElementById('searchBtn').addEventListener('click', renderTable);
+document.getElementById('globalSearch').addEventListener('keydown', (e)=>{ if(e.key==='Enter') renderTable(); });
+document.getElementById('quickSearch').addEventListener('keydown', (e)=>{ if(e.key==='Enter') renderTable(); });
+document.getElementById('statusFilter').addEventListener('change', renderTable);
+document.getElementById('dateFrom').addEventListener('change', renderTable);
+document.getElementById('dateTo').addEventListener('change', renderTable);
+
+(function themeInit(){
+  const THEME_KEY = 'siteTheme';
+  const btn = document.getElementById('themeToggle');
+  function update(){ const isLight = document.body.classList.contains('light'); btn.textContent = isLight ? '🌞' : '🌙'; }
+  function init(){ const t = localStorage.getItem(THEME_KEY) || 'dark'; document.body.classList.toggle('light', t === 'light'); update(); }
+  btn.addEventListener('click', ()=>{
+    document.body.classList.toggle('light');
+    const newVal = document.body.classList.contains('light') ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, newVal);
+    update();
+  });
+  init();
+})();
+
+window.addEventListener('storage', (e)=>{ if(e.key === ORDERS_KEY || e.key === null) renderTable(); });
+
+sampleOrdersIfEmpty();
+renderTable();
+</script>
+</body>
+</html>

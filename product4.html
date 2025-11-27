@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Мышь Compact Lite | ShopElectro</title>
+<style>
+:root{
+  --bg:#121212; --panel:#1e1e1e; --muted:#2a2a2a; --accent:#ff6600; --text:#e6e6e6;
+  --mutedText:#bfbfbf; --radius:12px;
+}
+body.light{
+  --bg:#f6f6f6; --panel:#ffffff; --muted:#efefef; --text:#111111; --mutedText:#6b6b6b;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background .22s,color .22s}
+a{color:inherit;text-decoration:none}
+
+
+.header{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; gap:12px;
+  padding:12px 22px; background:var(--panel);
+  box-shadow:0 1px 0 rgba(0,0,0,0.35);
+}
+.header-left{display:flex;align-items:center;gap:12px}
+.home-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;font-size:20px}
+.logo{font-weight:700}
+.search{flex:1;max-width:720px;display:flex;gap:8px;align-items:center}
+.search input{width:100%;padding:10px;border-radius:10px;border:none;background:var(--muted);color:var(--text)}
+.search button{height:40px;padding:8px 10px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.nav{display:flex;gap:10px;align-items:center}
+.nav a{text-decoration:none}
+.nav button{background:var(--muted);border:none;padding:8px 14px;border-radius:10px;color:var(--text);cursor:pointer}
+.nav button.active{background:var(--accent);color:#111}
+#themeToggle{width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.hamburger{display:none;width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+
+
+.container{max-width:1100px;margin:32px auto;display:flex;gap:28px;padding:20px}
+.left{width:420px;background:var(--panel);padding:20px;border-radius:12px;background-size:contain;background-position:center;background-repeat:no-repeat;min-height:320px}
+.right{flex:1;background:var(--panel);padding:20px;border-radius:12px;display:flex;flex-direction:column}
+h1{margin:0 0 8px;font-size:1.4rem}
+.price{color:var(--accent);font-weight:800;font-size:1.6rem;margin:12px 0}
+.btn{padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+.buy{background:var(--accent);color:#111}
+.cart{background:var(--muted);color:var(--text)}
+.specs{margin-top:18px;background:var(--muted);padding:14px;border-radius:10px;color:var(--text)}
+.meta{color:var(--mutedText);margin-top:6px}
+
+
+@media (max-width:980px){
+  .container{flex-direction:column;padding:16px}
+  .left{width:100%;min-height:240px}
+  .nav{display:none}
+  .hamburger{display:inline-flex}
+}
+button:focus,input:focus{outline:3px solid rgba(255,102,0,0.18);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<header class="header" role="banner">
+  <div class="header-left">
+    <button class="hamburger" id="hamburger" aria-label="Открыть меню">☰</button>
+    <a class="home-icon" href="index.html" title="Главная">🏠</a>
+    <div class="logo">ShopElectro</div>
+  </div>
+
+  <div class="search" role="search">
+    <input id="globalSearch" placeholder="Поиск по товарам..." aria-label="Поиск по товарам" />
+    <button id="searchBtn" title="Искать">🔎</button>
+  </div>
+
+  <nav class="nav" role="navigation" aria-label="Главная навигация">
+    <a href="catalog.html"><button>Каталог</button></a>
+    <a href="profile.html"><button>Профиль</button></a>
+    <a href="orders.html"><button>Корзина</button></a>
+    <a href="reviews.html"><button>Отзывы</button></a>
+    <a href="company.html"><button>Компания</button></a>
+  </nav>
+
+  <button id="themeToggle" title="Переключить тему" aria-pressed="false">🌓</button>
+</header>
+
+<main class="container" role="main">
+  <div id="photo" class="left" aria-hidden="true"></div>
+
+  <div class="right">
+    <h1 id="title">Товар</h1>
+    <div id="rating" class="meta"></div>
+    <div class="price" id="price">₸ 0</div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <button id="buyBtn" class="btn buy">Купить</button>
+      <button id="cartBtn" class="btn cart">В корзину</button>
+      <a href="catalog.html"><button class="btn" style="background:#444;color:#fff">← В каталог</button></a>
+    </div>
+
+    <div class="specs" id="specs" aria-live="polite"></div>
+  </div>
+</main>
+
+<script>
+
+const PRODUCT_ID = 4;
+const PRODUCTS_KEY = 'catalogProducts';
+const defaultProducts = [
+  {
+    id:4,
+    name:'Мышь Compact Lite',
+    category:'mouse',
+    brand:'Brand B',
+    price:990,
+    rating:3,
+    stock:true,
+    img:'images/compactl1_1.jpg',
+    specs:{ 'Тип':'Универсальная', 'Разрешение':'1600 DPI', 'Вес':'80 г' }
+  }
+];
+
+function getProducts(){
+  try{
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    if(raw){
+      const arr = JSON.parse(raw);
+      if(Array.isArray(arr) && arr.length) return arr;
+    }
+  }catch(e){}
+  return defaultProducts;
+}
+
+const products = getProducts();
+const p = products.find(x => Number(x.id) === Number(PRODUCT_ID)) || defaultProducts[0];
+
+document.getElementById('title').innerText = p.name;
+document.getElementById('price').innerText = p.price.toLocaleString('ru-RU') + ' ₸';
+document.getElementById('rating').innerText = 'Рейтинг: ' + '★'.repeat(p.rating) + '☆'.repeat(5-p.rating);
+document.getElementById('photo').style.backgroundImage = `url('${p.img}')`;
+document.getElementById('photo').style.backgroundSize = 'cover';
+document.getElementById('photo').style.backgroundPosition = 'center';
+
+let s = '<h3>Характеристики</h3><ul>';
+for(const k in p.specs){ s += `<li><b>${escapeHtml(k)}:</b> ${escapeHtml(p.specs[k])}</li>`; }
+s += `</ul><p class="meta"><b>Бренд:</b> ${escapeHtml(p.brand)} • <b>Категория:</b> ${escapeHtml(p.category)}</p>`;
+document.getElementById('specs').innerHTML = s;
+
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+
+(function(){
+  const CART_KEY = 'shopCart';
+  function loadCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); }catch(e){ return []; } }
+  function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); window.dispatchEvent(new Event('storage')); }
+
+  window.addToCart = window.addToCart || function(prod, qty = 1){
+    const cart = loadCart();
+    const idx = cart.findIndex(i => Number(i.id) === Number(prod.id));
+    if(idx > -1) cart[idx].qty = (cart[idx].qty||0) + qty;
+    else cart.push({ id: prod.id, name: prod.name, price: prod.price, img: prod.img||'', qty: qty, brand: prod.brand||'' });
+    saveCart(cart);
+    const prev = document.getElementById('prodToast');
+    if(prev) prev.remove();
+    const t = document.createElement('div');
+    t.id = 'prodToast';
+    t.style.position = 'fixed'; t.style.left = '50%'; t.style.top = '12%';
+    t.style.transform = 'translateX(-50%)'; t.style.background = 'var(--panel)';
+    t.style.color = 'var(--text)'; t.style.padding = '10px 14px'; t.style.borderRadius = '10px';
+    t.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)'; t.textContent = 'Товар добавлен в корзину';
+    document.body.appendChild(t);
+    setTimeout(()=> t.remove(), 1500);
+  };
+})();
+
+document.getElementById('cartBtn').addEventListener('click', ()=> addToCart(p,1));
+document.getElementById('buyBtn').addEventListener('click', ()=> { addToCart(p,1); setTimeout(()=> location.href='orders.html', 250); });
+
+
+(function(){
+
+  const hamb = document.getElementById('hamburger');
+  const nav = document.querySelector('.nav');
+  if(hamb && nav){
+    const panel = document.createElement('div');
+    panel.id = 'mobileNavPanel';
+    Object.assign(panel.style,{
+      position:'fixed', top:'0', right:'0', height:'100vh', width:'80%', maxWidth:'360px',
+      background: getComputedStyle(document.documentElement).getPropertyValue('--panel') || 'var(--panel)',
+      boxShadow:'-10px 0 30px rgba(0,0,0,0.4)', transform:'translateX(100%)',
+      transition:'transform .22s ease', zIndex:9999, padding:'20px', overflowY:'auto'
+    });
+    panel.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px">${nav.innerHTML}</div><div style="height:20px"></div><button id="mobileClose" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--muted);color:var(--text);">Закрыть</button>`;
+    document.body.appendChild(panel);
+    function open(){ panel.style.transform='translateX(0)'; document.body.style.overflow='hidden'; }
+    function close(){ panel.style.transform='translateX(100%)'; document.body.style.overflow=''; }
+    hamb.addEventListener('click', open);
+    panel.querySelector('#mobileClose').addEventListener('click', close);
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+  }
+
+  const THEME_KEY = 'siteTheme';
+  const themeBtn = document.getElementById('themeToggle');
+  const globalSearch = document.getElementById('globalSearch');
+  const searchBtn = document.getElementById('searchBtn');
+
+  function updateThemeButton(){
+    if(!themeBtn) return;
+    const isLight = document.body.classList.contains('light');
+    themeBtn.textContent = isLight ? '🌞' : '🌙';
+    themeBtn.setAttribute('aria-pressed', String(isLight));
+  }
+  function initTheme(){
+    const t = localStorage.getItem(THEME_KEY) || 'dark';
+    document.body.classList.toggle('light', t === 'light');
+    updateThemeButton();
+  }
+  function toggleTheme(){
+    const newVal = document.body.classList.contains('light') ? 'dark' : 'light';
+    document.body.classList.toggle('light');
+    localStorage.setItem(THEME_KEY, newVal);
+    updateThemeButton();
+  }
+
+  function buildCatalogUrl(q){
+    const url = new URL('catalog.html', location.href);
+    if(q && q.trim()) url.searchParams.set('q', q.trim());
+    return url.toString();
+  }
+  function globalSearchHandler(e){
+    if(e instanceof KeyboardEvent && e.key !== 'Enter') return;
+    const q = (globalSearch && globalSearch.value || '').trim();
+    location.href = buildCatalogUrl(q);
+  }
+
+  if(themeBtn) themeBtn.addEventListener('click', toggleTheme);
+  if(globalSearch) globalSearch.addEventListener('keydown', globalSearchHandler);
+  if(searchBtn) searchBtn.addEventListener('click', globalSearchHandler);
+  initTheme();
+
+
+  (function prefill(){
+    try{
+      const params = new URLSearchParams(location.search);
+      const q = params.get('q') || params.get('search') || '';
+      if(q && globalSearch) globalSearch.value = q;
+    }catch(e){}
+  })();
+
+})();
+</script>
+</body>
+</html>
