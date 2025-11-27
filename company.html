@@ -36,150 +36,87 @@ body{
   -moz-osx-font-smoothing:grayscale;
   transition:background .22s,color .22s;
 }
-
-
 .header{
   position:sticky; top:0; z-index:60;
-  display:flex; align-items:center; gap:14px;
-  padding:12px 22px; background:var(--panel);
+  display:flex; align-items:center; gap:12px;
+  padding:10px 18px; background:var(--panel);
   box-shadow:0 1px 0 rgba(0,0,0,0.35);
 }
 .header-left{display:flex;align-items:center;gap:12px}
 .home-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;font-size:20px;text-decoration:none}
-.logo{font-weight:700;font-size:1.1rem}
+.logo{font-weight:700;font-size:1.05rem}
 .search{flex:1;max-width:720px;display:flex;gap:8px;align-items:center}
-.search input{width:100%;padding:10px;border-radius:10px;border:none;background:var(--muted);color:var(--text)}
-.search button{height:40px;padding:8px 10px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
-.nav{display:flex;gap:10px;align-items:center}
+.search input{width:100%;padding:8px 10px;border-radius:10px;border:none;background:var(--muted);color:var(--text)}
+.search button{height:36px;padding:8px 10px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.nav{display:flex;gap:8px;align-items:center}
 .nav a{text-decoration:none}
-.nav button{background:var(--muted);color:var(--text);border:none;padding:10px 16px;border-radius:10px;cursor:pointer}
+.nav button{background:var(--muted);color:var(--text);border:none;padding:8px 12px;border-radius:10px;cursor:pointer}
 .nav button.active{background:var(--accent);color:#111;font-weight:700}
-#themeToggle{width:42px;height:42px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+#themeToggle{width:40px;height:40px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
+.hamburger{display:none;width:40px;height:40px;border-radius:10px;border:none;background:var(--muted);color:var(--text);cursor:pointer}
 
-
-.container{max-width:1200px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-.hero-panel{grid-column:1 / -1;display:flex;gap:24px}
-.card{
-  background:var(--panel);
-  border-radius:18px;
-  padding:26px;
-  box-shadow: 0 2px 0 rgba(0,0,0,0.4) inset;
-}
-
-
-.left-big{flex:1;min-height:360px;display:flex;flex-direction:column;gap:18px;border-radius:18px}
-.right-big{flex:1;min-height:360px;display:flex;flex-direction:column;gap:18px;border-radius:18px}
-
-
-.title{
-  text-align:center;
-  font-size:2rem;
-  font-weight:600;
-  margin-bottom:6px;
-}
-
-
-.company-body{display:flex;gap:18px}
-.company-left{flex:1;padding:12px 6px}
-.company-right{flex:1;padding:12px 6px}
-
-.section-title{font-weight:700;margin-bottom:10px;font-size:1.05rem}
+.container{max-width:1200px;margin:20px auto;padding:0 18px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.hero-panel{grid-column:1 / -1;display:flex;gap:18px;align-items:center;padding:20px;border-radius:14px;background:var(--panel)}
+.card{background:var(--panel);border-radius:14px;padding:18px}
+.left-big{min-height:260px;display:flex;flex-direction:column;gap:14px;border-radius:12px}
+.right-big{min-height:260px;display:flex;flex-direction:column;gap:14px;border-radius:12px}
+.title{text-align:left;font-size:1.6rem;font-weight:600;margin:0}
+.company-body{display:flex;gap:12px;flex-wrap:wrap}
+.company-left{flex:1;padding:6px}
+.company-right{flex:1;padding:6px}
+.section-title{font-weight:700;margin-bottom:8px;font-size:1.05rem}
 .paragraph{line-height:1.6;color:var(--mutedText)}
-
-
-.docs-box{
-  margin-top:auto;
-  display:flex;
-  gap:12px;
-  align-items:center;
-  justify-content:flex-end;
-}
-.doc-btn{
-  background:var(--muted);
-  color:var(--text);
-  padding:12px 18px;
-  border-radius:10px;
-  border:none;
-  cursor:pointer;
-}
-.doc-link{
-  display:inline-block;
-  background:var(--soft);
-  height:46px;
-  width:280px;
-  border-radius:8px;
-}
-
-
-.guarantee-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px}
-.guarantee-item{
-  background:rgba(255,255,255,0.02);
-  padding:12px;
-  border-radius:10px;
-  font-weight:600;
-  color:var(--mutedText);
-}
-
-
-.branches{grid-column:1 / -1;background:var(--panel);border-radius:18px;padding:28px;margin-top:8px}
-.branches h2{text-align:center;margin:0 0 14px;font-size:1.8rem}
-.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.branch-item{background:var(--muted);padding:12px;border-radius:10px;min-height:80px}
+.docs-box{margin-top:auto;display:flex;gap:10px;align-items:center;justify-content:flex-end}
+.doc-btn{background:var(--muted);color:var(--text);padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+.doc-link{display:inline-block;background:var(--soft);height:44px;width:220px;border-radius:8px}
+.guarantee-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+.guarantee-item{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;font-weight:600;color:var(--mutedText)}
+.branches{grid-column:1 / -1;border-radius:12px;padding:18px;background:var(--panel)}
+.branches h2{text-align:center;margin:0 0 12px;font-size:1.25rem}
+.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.branch-item{background:var(--muted);padding:10px;border-radius:8px;min-height:72px}
 .branch-item h4{margin:0 0 6px}
 .branch-item p{margin:0;color:var(--mutedText)}
+.contact-box{margin-top:12px;background:rgba(0,0,0,0.04);padding:10px;border-radius:8px}
+.small-note{color:var(--mutedText);font-size:0.9rem;margin-top:10px}
+.cta{display:inline-block;margin-top:10px;padding:10px 14px;border-radius:8px;background:var(--accent);color:#111;font-weight:800;text-decoration:none}
+.header-image{width:280px;height:120px;border-radius:10px;background:#222;background-size:cover;background-position:center}
 
-
-.contact-box{margin-top:22px;background:rgba(0,0,0,0.06);padding:12px;border-radius:10px}
-.contact-box p{margin:6px 0;color:var(--mutedText)}
-
-
-.small-note{color:var(--mutedText);font-size:0.9rem;margin-top:12px}
-.cta{
-  display:inline-block;
-  margin-top:16px;
-  padding:12px 18px;
-  border-radius:10px;
-  background:var(--accent);
-  color:#111;
-  font-weight:800;
-  text-decoration:none;
-}
-
-
-.header-image{
-  width:320px;
-  height:140px;
-  border-radius:12px;
-  background:#222;
-  background-size:cover;
-  background-position:center;
-  align-self:start;
-}
-
+.mobile-nav-panel{position:fixed;right:0;top:0;height:100vh;width:84%;max-width:360px;background:var(--panel);box-shadow:-10px 0 30px rgba(0,0,0,0.45);transform:translateX(100%);transition:transform .22s ease;z-index:9999;padding:18px;display:flex;flex-direction:column;gap:12px}
+.mobile-nav-panel.show{transform:translateX(0)}
+.mobile-nav-panel a{display:block;text-decoration:none}
 
 @media (max-width:1000px){
-  .container{grid-template-columns:1fr;padding:20px}
-  .hero-panel{flex-direction:column}
-  .header-image{width:100%;height:180px}
+  .container{grid-template-columns:1fr;padding:14px;gap:14px}
+  .hero-panel{flex-direction:column;align-items:stretch;padding:14px}
+  .header-image{width:100%;height:160px;border-radius:10px}
   .branch-grid{grid-template-columns:repeat(2,1fr)}
+  .nav{display:none}
+  .hamburger{display:inline-flex}
+  .search{order:2;width:100%}
+  #themeToggle{order:3}
 }
 @media (max-width:640px){
   .branch-grid{grid-template-columns:1fr}
+  .hero-panel{padding:12px}
+  .card{padding:12px}
+  .guarantee-list{grid-template-columns:1fr}
+  .title{font-size:1.25rem}
+  .header{padding:10px 12px}
 }
-
-
-button:focus, a:focus, input:focus { outline: 3px solid rgba(255,102,0,0.18); outline-offset:2px; }
+button:focus,a:focus,input:focus{outline:3px solid rgba(255,102,0,0.18);outline-offset:2px}
 </style>
 </head>
 <body>
 
-<header class="header">
+<header class="header" role="banner">
   <div class="header-left">
+    <button class="hamburger" id="hamburger" aria-label="Открыть меню">☰</button>
     <a class="home-icon" href="index.html" title="Главная">🏠</a>
     <div class="logo">ShopElectro</div>
   </div>
 
-  <div class="search">
+  <div class="search" role="search">
     <input id="globalSearch" placeholder="Поиск по товарам..." aria-label="Поиск по товарам" />
     <button id="searchBtn" title="Искать">🔎</button>
   </div>
@@ -195,68 +132,70 @@ button:focus, a:focus, input:focus { outline: 3px solid rgba(255,102,0,0.18); ou
   <button id="themeToggle" title="Переключить тему" aria-pressed="false">🌓</button>
 </header>
 
-<div class="container">
+<div id="mobileNavPanel" class="mobile-nav-panel" aria-hidden="true">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <strong>Навигация</strong>
+    <button id="mobileClose" aria-label="Закрыть" style="background:var(--muted);border:none;padding:8px;border-radius:8px;color:var(--text)">✕</button>
+  </div>
+  <a href="catalog.html"><button style="width:100%;padding:12px;border-radius:8px;border:none;background:var(--muted);color:var(--text);text-align:left">Каталог</button></a>
+  <a href="profile.html"><button style="width:100%;padding:12px;border-radius:8px;border:none;background:var(--muted);color:var(--text);text-align:left">Профиль</button></a>
+  <a href="orders.html"><button style="width:100%;padding:12px;border-radius:8px;border:none;background:var(--muted);color:var(--text);text-align:left">Корзина</button></a>
+  <a href="reviews.html"><button style="width:100%;padding:12px;border-radius:8px;border:none;background:var(--muted);color:var(--text);text-align:left">Отзывы</button></a>
+  <a href="company.html"><button style="width:100%;padding:12px;border-radius:8px;border:none;background:var(--muted);color:var(--text);text-align:left">Компания</button></a>
+</div>
 
-  <div class="hero-panel card">
+<main class="container" role="main">
+  <section class="hero-panel card" aria-label="О компании">
     <div style="flex:1">
       <div class="title">О компании</div>
       <div class="paragraph small-note">
-        ShopElectro — сеть магазинов электроники с фокусом на качестве, честных ценах и быстрой поддержке.
-        Мы работаем с 2012 года и за это время выросли из маленького стартапа до сети филиалов в крупных городах.
+        ShopElectro — сеть магазинов электроники с фокусом на качестве, честных ценах и быстрой поддержке. Мы работаем с 2012 года и за это время выросли из стартапа в сеть филиалов.
       </div>
     </div>
     <div class="header-image card" id="companyHeaderImage" role="img" aria-label="Изображение компании"></div>
-  </div>
+  </section>
 
-  <div class="card left-big">
-    <div class="section-title">История развития</div>
+  <article class="card left-big" aria-labelledby="historyTitle">
+    <div id="historyTitle" class="section-title">История развития</div>
     <div class="paragraph">
-      В 2012 году ShopElectro открыл первый магазин с идеей — сделать качественную технику доступной.
-      В 2016 году мы расширились до онлайн-продаж, а в 2019 — открыли распределительный центр.
-      Сейчас у нас сотни поставщиков и собственная служба поддержки, которая помогает клиентам с подбором и гарантийным обслуживанием.
+      В 2012 году ShopElectro открыл первый магазин с идеей — сделать качественную технику доступной. В 2016 мы расширились до онлайн-продаж, а в 2019 открыли распределительный центр. Сейчас у нас сотни поставщиков и своя служба поддержки.
     </div>
 
     <div class="contact-box">
       <div class="section-title" style="font-size:1rem">Контактные номера</div>
       <p>Горячая линия: +7 (700) 123-45-67</p>
       <p>Служба поддержки: support@shopelectro.example</p>
-
-      <div style="height:18px"></div>
-
+      <div style="height:8px"></div>
       <div class="section-title" style="font-size:1rem">Адрес головного офиса</div>
       <p>г. Нур-Султан, ул. Технологическая, 12</p>
-
       <a class="cta" href="mailto:support@shopelectro.example">Связаться с нами</a>
     </div>
-  </div>
+  </article>
 
-  <div class="card right-big">
-    <div class="section-title">Гарантии и права</div>
+  <aside class="card right-big" aria-labelledby="guarTitle">
+    <div id="guarTitle" class="section-title">Гарантии и права</div>
     <div class="paragraph">
-      Мы предоставляем официальную гарантию на всю технику от производителей, а также дополнительную гарантию от ShopElectro:
+      Мы предоставляем официальную гарантию на всю технику от производителей и дополнительную гарантию от ShopElectro.
     </div>
-    <div class="guarantee-list" style="margin-top:12px">
+    <div class="guarantee-list" aria-hidden="false">
       <div class="guarantee-item">Официальная гарантия производителя</div>
       <div class="guarantee-item">Замена товара в течение 14 дней</div>
       <div class="guarantee-item">Бесплатная техническая поддержка</div>
       <div class="guarantee-item">Защита покупателя: возврат средств</div>
     </div>
-
-    <div style="flex:1"></div>
-
-    <div class="section-title" style="margin-top:12px;font-size:1rem">Блок с документами</div>
+    <div style="height:10px"></div>
+    <div class="section-title" style="font-size:1rem">Документы</div>
     <div style="display:flex;align-items:center;justify-content:flex-end;margin-top:8px">
       <div class="doc-link" id="docPlaceholder" aria-hidden="true"></div>
       <div style="width:8px"></div>
       <button class="doc-btn" onclick="downloadDocs()">Скачать архив</button>
     </div>
+    <div class="small-note">Все документы соответствуют стандартам и действуют на территории РК.</div>
+  </aside>
 
-    <div class="small-note" style="margin-top:12px">Все документы соответствуют стандартам и действуют на территории РК.</div>
-  </div>
-
-  <div class="branches card">
-    <h2>Отделы сети в городах:</h2>
-    <div class="branch-grid" style="margin-top:16px">
+  <section class="branches card" aria-labelledby="branchesTitle">
+    <h2 id="branchesTitle">Отделы сети в городах:</h2>
+    <div class="branch-grid" style="margin-top:12px">
       <div class="branch-item">
         <h4>Нур-Султан</h4>
         <p>ул. Технологическая, 12 — +7 (700) 123-45-67</p>
@@ -282,17 +221,18 @@ button:focus, a:focus, input:focus { outline: 3px solid rgba(255,102,0,0.18); ou
         <p>ул. Университетская, 21 — +7 (701) 444-99-00</p>
       </div>
     </div>
-  </div>
-
-</div>
+  </section>
+</main>
 
 <script>
-
 (function(){
   const THEME_KEY = 'siteTheme';
   const themeBtn = document.getElementById('themeToggle');
   const searchInput = document.getElementById('globalSearch');
   const searchBtn = document.getElementById('searchBtn');
+  const hamburger = document.getElementById('hamburger');
+  const mobilePanel = document.getElementById('mobileNavPanel');
+  const mobileClose = document.getElementById('mobileClose');
 
   function updateThemeButton(){
     const isLight = document.body.classList.contains('light');
@@ -330,25 +270,30 @@ button:focus, a:focus, input:focus { outline: 3px solid rgba(255,102,0,0.18); ou
   searchBtn.addEventListener('click', globalSearchHandler);
   initTheme();
 
+  function openMobile(){ mobilePanel.classList.add('show'); mobilePanel.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+  function closeMobile(){ mobilePanel.classList.remove('show'); mobilePanel.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+  if(hamburger) hamburger.addEventListener('click', openMobile);
+  if(mobileClose) mobileClose.addEventListener('click', closeMobile);
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeMobile(); });
 
   (function prefill(){
-    const params = new URLSearchParams(location.search);
-    const q = params.get('q') || params.get('search') || '';
-    if(q) searchInput.value = q;
+    try{
+      const params = new URLSearchParams(location.search);
+      const q = params.get('q') || params.get('search') || '';
+      if(q) searchInput.value = q;
+    }catch(e){}
   })();
 })();
 
-
 (function(){
-  const localPath = '/mnt/data/Магазин ShopElectro (7).png';
   const headerImage = document.getElementById('companyHeaderImage');
   if(headerImage){
-    headerImage.style.backgroundImage = `url('${localPath}')`;
+    headerImage.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18)), url('images/company_banner.jpg')";
   }
 })();
 
 function downloadDocs(){
-  alert('Заглушка: ).');
+  alert('Загрузка документов (заглушка).');
 }
 </script>
 
